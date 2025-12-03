@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JOYFIT24 経堂 | 12月ホットスタジオ体験レッスン受付中</title>
+    <title>JOYFIT24 経堂 | ホットスタジオ無料体験</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -77,31 +77,32 @@
 
         /* --- UI Elements --- */
         
-        /* ★★★ インストラクター名とアイコンのスタイル修正 ★★★ */
-        .instructor-trigger {
-            /* 下線装飾を削除 */
-            text-decoration: none !important;
-            transition: all 0.2s ease;
-        }
-
-        .instructor-trigger .instructor-name {
-            color: #333; /* 文字色を黒に */
-            font-weight: 700;
-        }
-        
-        .instructor-trigger img {
+        /* インストラクターアイコンの六角形クリップパス */
+        .hex-icon {
+            clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
             border: 3px solid var(--joy-red); /* 赤枠 */
             box-shadow: 0 0 8px rgba(194, 22, 66, 0.7); /* 赤いネオン発光 */
             transition: all 0.2s ease;
         }
 
-        .instructor-trigger:hover img {
+        .instructor-trigger {
+            text-decoration: none !important;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .instructor-trigger:hover .hex-icon {
             box-shadow: 0 0 12px var(--joy-red), 0 0 20px rgba(255, 255, 255, 0.5); /* ホバーで発光強化 */
         }
-        /* ★★★ 修正終了 ★★★ */
 
+        /* インストラクター名 */
+        .instructor-name {
+            color: #333;
+            font-weight: 700;
+        }
 
-        /* シンプルレーシングボタン (黒枠とグレー影を削除) */
+        /* シンプルレーシングボタン */
         .btn-simple-racing {
             position: relative;
             display: inline-flex;
@@ -114,14 +115,10 @@
             text-decoration: none;
             letter-spacing: 0.05em;
             border-radius: 4px;
-            
-            /* シンプルな太枠を維持 */
             border: 2px solid white; 
             outline: 2px solid var(--joy-red); 
             outline-offset: -2px;
-            
             box-shadow: 0 4px 6px rgba(0,0,0,0.2); 
-            
             transition: all 0.2s ease;
         }
 
@@ -131,13 +128,18 @@
             box-shadow: 0 6px 12px rgba(0,0,0,0.3);
         }
         
-        /* 曜日タブ */
+        /* 曜日タブの修正 */
         .tab-btn {
             border: 2px solid #ddd;
             background: #fff;
             color: #555;
             font-weight: bold;
-            padding: 0.5rem 1.2rem;
+            padding: 0.5rem 0.1rem; /* 左右のパディングを減らす */
+            width: 40px; /* 幅を固定 */
+            height: 40px; /* 高さを固定 */
+            display: flex;
+            justify-content: center;
+            align-items: center;
             clip-path: polygon(10% 0%, 100% 0%, 90% 100%, 0% 100%);
             transition: all 0.3s;
             cursor: pointer;
@@ -149,6 +151,11 @@
             border-color: var(--joy-red);
             transform: scale(1.1);
             box-shadow: 0 4px 10px rgba(194, 22, 66, 0.4);
+        }
+        
+        /* 曜日タブの親コンテナのギャップを調整 */
+        #day-tabs {
+            gap: 0.5rem; /* ギャップを狭く */
         }
 
         /* 入力フィールド */
@@ -184,6 +191,28 @@
                 100% calc(100% - 10px), calc(100% - 10px) 100%, 10px 100%, 0 calc(100% - 10px)
             );
             border: 2px solid var(--joy-red);
+        }
+        
+        /* レッスンリストのレイアウト調整（全て左寄せで安定化） */
+        .lesson-item-container {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start; /* すべての要素を左寄せに統一 */
+            width: 100%;
+            text-align: left;
+            gap: 0.5rem;
+        }
+        .lesson-title-stars {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+        }
+
+        /* モバイル時のボタン配置調整 */
+        @media (max-width: 768px) {
+            .lesson-item-container {
+                align-items: center; /* モバイルではボタンの近くに情報を集約 */
+            }
         }
     </style>
 </head>
@@ -256,7 +285,6 @@
                 <div class="grid md:grid-cols-2 gap-6">
                     <!-- Voice 1 -->
                     <div class="bg-gray-50 p-5 border border-gray-200 shadow-sm relative">
-                        <!-- 修正: USER 01 -> お客様① -->
                         <div class="absolute -top-3 -left-3 bg-joy-red text-white text-[10px] font-bold px-2 py-1 transform skew-x-[-10deg] shadow">お客様①</div>
                         <div class="flex items-center mb-3">
                             <div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center mr-3 border border-joy-red">
@@ -272,7 +300,6 @@
                     </div>
                     <!-- Voice 2 -->
                     <div class="bg-gray-50 p-5 border border-gray-200 shadow-sm relative">
-                        <!-- 修正: USER 02 -> お客様② -->
                         <div class="absolute -top-3 -left-3 bg-joy-red text-white text-[10px] font-bold px-2 py-1 transform skew-x-[-10deg] shadow">お客様②</div>
                         <div class="flex items-center mb-3">
                             <div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center mr-3 border border-joy-red">
@@ -463,23 +490,31 @@
                         const instructorInfo = instructorData[lesson.instructorId];
                         const photoSrc = instructorInfo ? instructorInfo.photo : `https://placehold.co/80x80/DDDDDD/333333?text=${lesson.instructor.substring(0,2)}`;
                         const lessonElement = document.createElement('div');
-                        // デザインに合わせたリストアイテム
+                        
+                        // レッスン全体をフレックスコンテナとして設定
                         lessonElement.className = 'bg-white p-5 border-2 border-gray-100 flex flex-col md:flex-row items-center justify-between gap-6 hover:border-joy-red hover:shadow-lg transition-all duration-300 group rounded';
+                        
+                        // レッスン情報エリアのHTMLを左揃えに修正
                         lessonElement.innerHTML = `
-                            <div class="flex-1 text-center md:text-left w-full">
+                            <div class="flex-1 w-full text-left"> 
                                 <p class="font-noto-black text-2xl font-bold text-joy-red tracking-tight">${lesson.time}</p>
-                                <div class="flex flex-col md:flex-row items-center justify-center md:justify-start md:items-baseline mt-1">
+                                
+                                <!-- レッスン名と星 (1行目: 全て左寄せ) -->
+                                <div class="flex items-center justify-start mt-1">
                                     <p class="font-noto-black text-lg font-bold text-gray-800">${lesson.name}</p>
-                                    <div class="text-amber-500 text-base md:ml-3">${'★'.repeat(lesson.stars)}</div>
+                                    <div class="text-amber-500 text-base ml-3">${'★'.repeat(lesson.stars)}</div>
                                 </div>
-                                <button class="instructor-trigger inline-flex items-center mt-3 text-gray-500 hover:text-joy-red transition-colors" data-instructor-id="${lesson.instructorId}">
-                                    <span class="font-bold mr-2 text-[10px] text-joy-red border border-joy-red px-2 py-0.5 rounded">INSTRUCTOR</span>
-                                    <img src="${photoSrc}" alt="${lesson.instructor}" class="w-8 h-8 rounded-full object-cover mr-2" style="border: 3px solid var(--joy-red); box-shadow: 0 0 8px rgba(194, 22, 66, 0.7);">
-                                    <span class="font-bold text-sm instructor-name">${lesson.instructor}</span>
-                                </button>
+
+                                <!-- インストラクターとアイコン (2行目: 全て左寄せ) -->
+                                <div class="mt-3 flex items-start"> 
+                                    <button class="instructor-trigger flex items-center text-gray-500 hover:text-joy-red transition-colors" data-instructor-id="${lesson.instructorId}">
+                                        <span class="font-bold mr-2 text-[10px] text-joy-red border border-joy-red px-2 py-0.5 rounded">INSTRUCTOR</span>
+                                        <img src="${photoSrc}" alt="${lesson.instructor}" class="w-8 h-8 rounded-full object-cover mr-2 hex-icon" style="border: 3px solid var(--joy-red); box-shadow: 0 0 8px rgba(194, 22, 66, 0.7);">
+                                        <span class="font-bold text-sm instructor-name">${lesson.instructor}</span>
+                                    </button>
+                                </div>
                             </div>
                             <div class="w-full md:w-auto">
-                                <!-- 体験予約ボタンに新しいシンプルクラスを適用 -->
                                 <button class="booking-btn btn-simple-racing w-full md:w-auto text-sm" data-lesson-name="${lesson.name}" data-lesson-time="${lesson.time}" data-lesson-day="${dayName}" data-day-index="${dayKey}" data-lesson-instructor="${lesson.instructor}">体験予約</button>
                             </div>
                         `;
