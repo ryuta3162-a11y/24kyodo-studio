@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="ja" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JOYFIT24 経堂 | 12月ホットスタジオ体験レッスン受付中</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts (Noto Sans JP) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        /* =========================================
+           Pure White Racing Cockpit Design System
+           ========================================= */
+        :root { 
+            --joy-red: #C21642; 
+            --deep-red: #8E0E30; 
+            --border-thickness: 4px; 
+            --shadow-offset: 8px;
+            --card-inner-bg: #ffffff;
+            --bg-color: #f7f7f7;
+        }
+
+        body {
+            font-family: 'Noto Sans JP', sans-serif;
+            color: #333;
+            /* 背景: 薄いグレー */
+            background-color: var(--bg-color);
+            line-height: 1.75;
+            overflow-x: hidden;
+            font-size: 14px; /* 全体の文字サイズを少し小さく */
+        }
+
+        .font-noto-black { font-weight: 900; }
+        .text-joy-red { color: var(--joy-red); }
+        .bg-joy-red { background-color: var(--joy-red); }
+
+        /* --- Card Styles --- */
+        
+        /* コンテンツカード */
+        .clipped-card {
+            background: var(--card-inner-bg);
+            /* 太い赤枠 */
+            border: var(--border-thickness) solid var(--joy-red);
+            /* 黒い影を削除し、ネオン効果のみ残す */
+            box-shadow: 0 0 10px rgba(194, 22, 66, 0.5); 
+            position: relative;
+            z-index: 10;
+            padding: 1.5rem;
+            margin-bottom: 3rem;
+            clip-path: polygon(
+                0 15px, 15px 0, calc(100% - 15px) 0, 100% 15px, 
+                100% calc(100% - 15px), calc(100% - 15px) 100%, 15px 100%, 0 calc(100% - 15px)
+            );
+        }
+
+        /* ヘッダーボックス (黒背景) */
+        .header-box {
+            background-color: #1a1a1a;
+            color: #fff;
+            border: var(--border-thickness) solid var(--joy-red);
+            /* 黒い影を削除し、ネオン効果のみ残す */
+            box-shadow: 0 0 15px rgba(194, 22, 66, 0.8);
+            padding: 2rem;
+            text-align: center;
+            margin-bottom: 3rem;
+            clip-path: polygon(
+                0 15px, 15px 0, calc(100% - 15px) 0, 100% 15px, 
+                100% calc(100% - 15px), calc(100% - 15px) 100%, 15px 100%, 0 calc(100% - 15px)
+            );
+        }
+
+        /* --- UI Elements --- */
+
+        /* シンプルレーシングボタン (黒枠とグレー影を削除) */
+        .btn-simple-racing {
+            position: relative;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            background: var(--joy-red);
+            color: white;
+            font-weight: 700;
+            padding: 0.8rem 2rem;
+            text-decoration: none;
+            letter-spacing: 0.05em;
+            border-radius: 4px;
+            
+            /* シンプルな太枠を維持 */
+            border: 2px solid white; 
+            outline: 2px solid var(--joy-red); 
+            outline-offset: -2px;
+            
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2); 
+            
+            transition: all 0.2s ease;
+        }
+
+        .btn-simple-racing:hover {
+            background: var(--deep-red);
+            transform: translateY(-2px); 
+            box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+        }
+        
+        /* 曜日タブ */
+        .tab-btn {
+            border: 2px solid #ddd;
+            background: #fff;
+            color: #555;
+            font-weight: bold;
+            padding: 0.5rem 1.2rem;
+            clip-path: polygon(10% 0%, 100% 0%, 90% 100%, 0% 100%);
+            transition: all 0.3s;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+        .tab-btn.active {
+            background: var(--joy-red);
+            color: white;
+            border-color: var(--joy-red);
+            transform: scale(1.1);
+            box-shadow: 0 4px 10px rgba(194, 22, 66, 0.4);
+        }
+
+        /* 入力フィールド */
+        .input-underline {
+            border: none;
+            border-bottom: 2px solid #ddd;
+            background: #f9f9f9;
+            width: 100%;
+            padding: 0.75rem;
+            transition: 0.3s;
+        }
+        .input-underline:focus {
+            outline: none;
+            border-bottom-color: var(--joy-red);
+            background: #fff;
+        }
+
+        /* FAQのアコーディオンマーカー */
+        details > summary { list-style: none; }
+        details > summary::-webkit-details-marker { display: none; }
+        details[open] summary .chevron-icon { transform: rotate(180deg); }
+
+        /* アニメーション */
+        .animate-fade-in { animation: fadeIn 0.8s ease-out forwards; opacity: 0; }
+        .animate-slide-up { animation: slideUp 0.8s ease-out 0.2s forwards; opacity: 0; transform: translateY(20px); }
+        @keyframes fadeIn { to { opacity: 1; } }
+        @keyframes slideUp { to { opacity: 1; transform: translateY(0); } }
+
+        /* モーダル調整 */
+        .modal-clip {
+            clip-path: polygon(
+                0 10px, 10px 0, calc(100% - 10px) 0, 100% 10px, 
+                100% calc(100% - 10px), calc(100% - 10px) 100%, 10px 100%, 0 calc(100% - 10px)
+            );
+            border: 2px solid var(--joy-red);
+        }
+    </style>
+</head>
+<body class="py-8 px-4 md:py-12">
+
+    <!-- メインラッパー -->
+    <div class="w-full max-w-4xl mx-auto">
+
+        <!-- ===== ヘッダーエリア ===== -->
+        <header class="header-box animate-fade-in">
+            <!-- 文字サイズを統一し、少し小さめに (text-3xl) -->
+            <h1 class="text-white mb-4 flex items-center justify-center gap-4 flex-wrap">
+                <span class="text-3xl md:text-4xl font-noto-black tracking-tighter">JOYFIT24</span>
+                <span class="text-3xl md:text-4xl font-noto-black tracking-widest">経堂</span>
+            </h1>
+            
+            <div class="inline-block border-t border-b border-gray-600 py-2 px-8 mb-6 bg-black/30">
+                <p class="font-bold text-lg tracking-widest text-white">
+                    ホットスタジオ無料体験
+                </p>
+            </div>
+            
+            <div>
+                <!-- プログラム詳細ボタンに新しいシンプルクラスを適用 -->
+                <a href="https://docs.google.com/presentation/d/1II0tceWD9bpfCcHUR8OLoIvgudUjH58ua7ihuH2JH7Y/edit?usp=sharing" 
+                   target="_blank" 
+                   rel="noopener noreferrer" 
+                   class="btn-simple-racing w-full max-w-xs text-sm md:text-base">
+                    プログラム詳細はこちら
+                </a>
+            </div>
+        </header>
+
+        <main>
+            <!-- ===== 4. レッスンスケジュール ===== -->
+            <section id="schedule" class="clipped-card animate-slide-up">
+                <div class="text-center mb-8">
+                    <h2 class="text-3xl font-noto-black text-joy-red italic tracking-tighter">LESSON SCHEDULE</h2>
+                    <p class="text-gray-500 font-bold mt-2 text-sm">ご希望のレッスンを選んで体験予約へ！</p>
+                </div>
+                
+                <!-- 難易度凡例 -->
+                <div class="bg-gray-50 p-3 border-l-4 border-joy-red text-center mb-8 mx-auto max-w-lg shadow-sm">
+                    <p class="font-bold text-gray-800 text-xs mb-2">★ レッスン難易度</p>
+                    <div class="flex justify-center flex-wrap gap-4 text-xs font-bold text-gray-600">
+                        <span class="flex items-center"><span class="text-amber-500 mr-1">★</span> 初心者</span>
+                        <span class="flex items-center"><span class="text-amber-500 mr-1">★★</span> 中級者</span>
+                        <span class="flex items-center"><span class="text-amber-500 mr-1">★★★</span> 上級者</span>
+                    </div>
+                </div>
+
+                <!-- 曜日選択タブ -->
+                <div id="day-tabs" class="flex flex-wrap justify-center gap-2 mb-8">
+                    <!-- JavaScriptでタブがここに挿入されます -->
+                </div>
+
+                <!-- レッスン表示エリア -->
+                <div id="schedule-contents-container">
+                    <!-- JavaScriptで選択された曜日のレッスンがここに挿入されます -->
+                </div>
+            </section>
+
+            <!-- ===== 6. お客様の声 ===== -->
+            <section class="clipped-card animate-slide-up">
+                <div class="text-center mb-8">
+                    <h2 class="text-3xl font-noto-black text-joy-red italic tracking-tighter">VOICE</h2>
+                    <p class="text-gray-500 font-bold mt-2 text-sm">お客様の声</p>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-6">
+                    <!-- Voice 1 -->
+                    <div class="bg-gray-50 p-5 border border-gray-200 shadow-sm relative">
+                        <div class="absolute -top-3 -left-3 bg-joy-red text-white text-[10px] font-bold px-2 py-1 transform skew-x-[-10deg] shadow">USER 01</div>
+                        <div class="flex items-center mb-3">
+                            <div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center mr-3 border border-joy-red">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-gray-500" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                            </div>
+                            <div>
+                                <p class="font-bold text-base">M.Sさん</p>
+                                <p class="text-[10px] text-gray-500">34歳・会社員</p>
+                            </div>
+                        </div>
+                        <h3 class="font-bold text-base mb-1 text-joy-red">"大量の汗が気持ちいい！"</h3>
+                        <p class="text-xs text-gray-600 leading-relaxed">運動不足解消のために入会。毎回信じられないくらい汗をかけてレッスン後は心も体もスッキリ。むくみも改善された！</p>
+                    </div>
+                    <!-- Voice 2 -->
+                    <div class="bg-gray-50 p-5 border border-gray-200 shadow-sm relative">
+                        <div class="absolute -top-3 -left-3 bg-joy-red text-white text-[10px] font-bold px-2 py-1 transform skew-x-[-10deg] shadow">USER 02</div>
+                        <div class="flex items-center mb-3">
+                            <div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center mr-3 border border-joy-red">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-gray-500" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                            </div>
+                            <div>
+                                <p class="font-bold text-base">K.Tさん</p>
+                                <p class="text-[10px] text-gray-500">42歳・主婦</p>
+                            </div>
+                        </div>
+                        <h3 class="font-bold text-base mb-1 text-joy-red">"冷え性が改善された"</h3>
+                        <p class="text-xs text-gray-600 leading-relaxed">長年の悩みだった冷え性が少しずつ改善されてきました。レッスンの種類が豊富でその日の気分で選べるのも楽しいです!</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ===== 7. よくある質問 ===== -->
+            <section class="clipped-card animate-slide-up">
+                <div class="text-center mb-8">
+                    <h2 class="text-3xl font-noto-black text-joy-red italic tracking-tighter">Q & A</h2>
+                    <p class="text-gray-500 font-bold mt-2 text-sm">よくあるご質問</p>
+                </div>
+                <div class="space-y-3">
+                    <details class="bg-gray-50 p-4 border-l-4 border-gray-300 open:border-joy-red transition-all duration-300 shadow-sm">
+                        <summary class="flex justify-between items-center cursor-pointer font-bold text-gray-800 hover:text-joy-red transition-colors text-sm md:text-base">
+                            ヨガ未経験で、体も硬いのですが大丈夫ですか？
+                            <svg class="chevron-icon w-4 h-4 text-joy-red transition-transform duration-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" /></svg>
+                        </summary>
+                        <p class="mt-3 text-gray-600 text-xs md:text-sm border-t border-gray-200 pt-3 leading-relaxed">全く問題ありません。会員様の8割以上が未経験からのスタートです。経験豊富なインストラクターが丁寧にサポートしますので、まずは★1のレッスンをご体験ください。</p>
+                    </details>
+                    <details class="bg-gray-50 p-4 border-l-4 border-gray-300 open:border-joy-red transition-all duration-300 shadow-sm">
+                        <summary class="flex justify-between items-center cursor-pointer font-bold text-gray-800 hover:text-joy-red transition-colors text-sm md:text-base">
+                            体験レッスン時の持ち物を教えてください。
+                            <svg class="chevron-icon w-4 h-4 text-joy-red transition-transform duration-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" /></svg>
+                        </summary>
+                        <p class="mt-3 text-gray-600 text-xs md:text-sm border-t border-gray-200 pt-3 leading-relaxed">動きやすい服装、水分、替えの下着、シャワー利用時はシャンプー等をお持ちください。タオル、ヨガマットは当日無料でレンタル可能です。</p>
+                    </details>
+                    <details class="bg-gray-50 p-4 border-l-4 border-gray-300 open:border-joy-red transition-all duration-300 shadow-sm">
+                        <summary class="flex justify-between items-center cursor-pointer font-bold text-gray-800 hover:text-joy-red transition-colors text-sm md:text-base">
+                            体験後に無理な勧誘はありませんか？
+                            <svg class="chevron-icon w-4 h-4 text-joy-red transition-transform duration-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" /></svg>
+                        </summary>
+                        <p class="mt-3 text-gray-600 text-xs md:text-sm border-t border-gray-200 pt-3 leading-relaxed">一切ございません。体験レッスンでJOYFITの良さを実感していただき、もし気に入っていただけましたらご入会をご検討ください。</p>
+                    </details>
+                </div>
+            </section>
+
+        </main>
+
+        <footer class="text-center py-8 text-gray-500 text-xs font-bold tracking-wider">
+            <p>&copy; 2025 JOYFIT24 KYODO. All Rights Reserved.</p>
+        </footer>
+
+    </div>
+
+    <!-- ===== 申し込みモーダル ===== -->
+    <div id="booking-modal" class="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 invisible opacity-0 transition-opacity duration-300">
+        <div id="modal-content" class="bg-white w-full max-w-md p-8 relative transform transition-all duration-300 scale-95 opacity-0 modal-clip shadow-[0_0_30px_rgba(194,22,66,0.6)]">
+            <button id="close-modal-btn" class="absolute top-4 right-4 text-gray-400 hover:text-joy-red transition-colors">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+            
+            <div id="form-view">
+                <h3 class="text-2xl font-black text-joy-red text-center italic tracking-tight">ENTRY FORM</h3>
+                <p class="text-center text-xs font-bold text-gray-500 mb-6">無料体験レッスン申請</p>
+                
+                <div id="lesson-details-view" class="mb-6 bg-gray-50 p-4 border-l-4 border-joy-red shadow-inner">
+                    <p class="text-xs text-gray-500 mb-1 font-bold">選択中のレッスン</p>
+                    <p id="modal-lesson-day-time" class="text-sm font-bold text-gray-800"></p>
+                    <p id="modal-lesson-name" class="text-xl font-black text-joy-red my-1"></p>
+                    <p id="modal-lesson-instructor" class="text-sm text-gray-600 font-bold"></p>
+                </div>
+
+                <form id="booking-form" class="space-y-5">
+                    <div class="group"><label class="block text-xs font-bold text-gray-500 mb-1">お名前 (フルネーム)</label><input type="text" id="full-name" name="fullName" required class="input-underline" placeholder="例：山田 太郎"></div>
+                    <div class="group"><label class="block text-xs font-bold text-gray-500 mb-1">メールアドレス</label><input type="email" id="email" name="email" required class="input-underline" placeholder="例：example@joyfit.jp"></div>
+                    <div class="group"><label class="block text-xs font-bold text-gray-500 mb-1">希望日</label><select id="desired-date" name="desiredDate" required class="input-underline bg-transparent"></select></div>
+                    
+                    <input type="hidden" id="lesson-name-hidden" name="lessonName">
+                    <input type="hidden" id="lesson-time" name="lessonTime">
+                    <input type="hidden" id="lesson-day" name="lessonDay">
+
+                    <div class="pt-6">
+                        <!-- 申し込みボタンにも立体アニメーションクラス(btn-simple-racing)を適用 -->
+                        <button type="submit" id="submit-btn" class="btn-simple-racing w-full text-lg">このレッスンに申し込む</button>
+                    </div>
+                </form>
+            </div>
+            <div id="success-message" class="hidden text-center py-8">
+                <h3 class="text-3xl font-black text-joy-red italic">COMPLETE!</h3>
+                <p class="mt-4 text-gray-700 font-bold">お申し込みありがとうございます。</p>
+                <p class="text-sm text-gray-500 mt-2">詳細はメールアドレスへお送りします。<br>ご確認ください。</p>
+                <button id="close-success-btn" class="mt-8 btn-simple-racing w-full">閉じる</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== インストラクター詳細モーダル ===== -->
+    <div id="instructor-modal" class="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 invisible opacity-0 transition-opacity duration-300">
+        <div id="instructor-modal-content" class="bg-white w-full max-w-2xl h-[80vh] relative transform transition-all duration-300 scale-95 opacity-0 modal-clip shadow-[0_0_30px_rgba(194,22,66,0.6)]">
+            <button id="close-instructor-modal-btn" class="absolute top-4 right-4 text-gray-400 hover:text-joy-red z-20 transition-colors">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+            <div id="instructor-details-container" class="p-8">
+                <!-- JSで詳細が挿入されます -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- データ定義 ---
+        const instructorData = {
+            'kikuchi': { name: '菊地 智子', photo: '菊池智子.png', photo_modal: '菊池智子.png' },
+            'bando': { name: '坂東', photo: '坂東.png', photo_modal: '坂東.png' },
+            'shikano': { name: 'Shikano', photo: 'Shikano.png', photo_modal: 'Shikano.png' },
+            'nakashima': { name: 'ナカシマトオル', photo: 'ナカシマトオル.png', photo_modal: 'ナカシマトオル.png' },
+            'yuki': { name: 'YUKI', photo: 'YUKI.png', photo_modal: 'YUKI.png' },
+            'mariko': { name: 'Mariko', photo: 'Mariko.png', photo_modal: 'Mariko.png' },
+            'hana': { name: 'Hana', photo: 'Hana.png', photo_modal: 'Hana.png' },
+            'takako': { name: 'takako', photo: 'takako.png', photo_modal: 'takako.png' },
+            'kanako': { name: 'kanako', photo: 'kanako.png', photo_modal: 'kanako.png' },
+            'goto': { name: '後藤 亜也', photo: '後藤亜也.png', photo_modal: '後藤亜也.png' },
+            'mie': { name: 'MIE', photo: 'MIE.png', photo_modal: 'MIE背景.png' },
+            'emi': { name: 'EMI', photo: 'EMI.png', photo_modal: 'EMI.png' },
+            'itsuku': { name: 'itsuku', photo: 'itsuku.png', photo_modal: 'itsuku.png' },
+            'hachi': { name: 'HACHI', photo: 'https://placehold.co/80x80/DDDDDD/333333?text=HA', photo_modal: 'https://placehold.co/150x150/DDDDDD/333333?text=HA' },
+        };
+        
+        const lessonsData = {
+            '0': [ 
+                { time: '09:30-10:30', name: 'フレッチャーピラティス', instructor: '菊地 智子', stars: 2, instructorId: 'kikuchi' },
+                { time: '12:45-13:45', name: 'BODY BALANCE', instructor: '坂東', stars: 3, instructorId: 'bando' },
+                { time: '14:00-14:45', name: 'カラダ調整ヨガ', instructor: '坂東', stars: 1, instructorId: 'bando' },
+                { time: '15:15-16:30', name: 'ボール&ヨガベーシック', instructor: 'Shikano', stars: 1, instructorId: 'shikano' },
+                { time: '16:45-17:45', name: 'リラックスほぐし&骨盤調整', instructor: 'Shikano', stars: 1, instructorId: 'shikano' },
+            ],
+            '1': [], 
+            '2': [ 
+                { time: '09:30-10:30', name: 'ハタヨガ', instructor: 'ナカシマトオル', stars: 2, instructorId: 'nakashima' },
+                { time: '10:45-11:45', name: 'パワーヨガ', instructor: 'ナカシマトオル', stars: 3, instructorId: 'nakashima' },
+                { time: '12:15-13:15', name: 'おやすみヨガ', instructor: 'YUKI', stars: 1, instructorId: 'yuki' },
+                { time: '13:45-14:30', name: 'アグニヨガ', instructor: 'YUKI', stars: 3, instructorId: 'yuki' },
+                { time: '19:30-20:45', name: 'ボール&ヨガベーシック', instructor: 'Shikano', stars: 1, instructorId: 'shikano' },
+            ],
+            '3': [ 
+                { time: '09:30-10:30', name: '朝ヨガ', instructor: 'Mariko', stars: 1, instructorId: 'mariko' },
+                { time: '10:45-11:45', name: 'シェイプアップヨガ', instructor: 'Mariko', stars: 2, instructorId: 'mariko' },
+                { time: '13:30-14:30', name: 'リズムステップ', instructor: 'HACHI', stars: 2, instructorId: 'hachi' },
+                { time: '15:00-16:00', name: '美脚美尻ヨガ', instructor: 'HACHI', stars: 2, instructorId: 'hachi' },
+                { time: '19:30-21:00', name: '筋膜リリースボールヨガ', instructor: 'takako', stars: 2, instructorId: 'takako' },
+            ],
+            '4': [], 
+            '5': [ 
+                { time: '09:30-10:30', name: '朝ヨガ', instructor: 'kanako', stars: 1, instructorId: 'kanako' },
+                { time: '11:00-12:00', name: '美bodyピラティス', instructor: '後藤 亜也', stars: 2, instructorId: 'goto' },
+                { time: '12:15-13:15', name: '顔ヨガ', instructor: '後藤 亜也', stars: 1, instructorId: 'goto' },
+                { time: '13:45-14:45', name: 'ホイールで遊ぶヨガ', instructor: 'MIE', stars: 2, instructorId: 'mie' },
+                { time: '15:15-16:15', name: 'SHIN美 (1･3･5週目)', instructor: 'MIE', stars: 2, instructorId: 'mie' },
+                { time: '15:15-16:15', name: 'Core Functional Yoga (2･4週目)', instructor: 'MIE', stars: 2, instructorId: 'mie' },
+                { time: '19:00-20:15', name: 'ハタヨガ', instructor: 'ナカシマトオル', stars: 2, instructorId: 'nakashima' },
+            ],
+            '6': [ 
+                { time: '09:30-10:30', name: 'フローヨガ', instructor: 'kanako', stars: 3, instructorId: 'kanako' },
+                { time: '11:00-12:00', name: 'ベーシックヨガ', instructor: 'kanako', stars: 1, instructorId: 'kanako' },
+                { time: '12:30-13:30', name: '全身巡らせ整えるヨガ (1･3･5週目)', instructor: 'EMI', stars: 2, instructorId: 'emi' },
+                { time: '12:30-13:30', name: 'アロマリラックスヨガ (2･4週目)', instructor: 'EMI', stars: 1, instructorId: 'emi' },
+                { time: '14:15-15:15', name: 'パワーヴィンヤサ', instructor: 'itsuku', stars: 3, instructorId: 'itsuku' },
+                { time: '15:45-16:45', name: '体幹とバランスを整えるヨガ', instructor: 'itsuku', stars: 3, instructorId: 'itsuku' },
+            ]
+        };
+        const weekdays = ['日曜日', '月曜日', '火曜日', '水曜日', '木曜日', '金曜日', '土曜日'];
+        const dayOrder = { '日曜日': 0, '月曜日': 1, '火曜日': 2, '水曜日': 3, '木曜日': 4, '金曜日': 5, '土曜日': 6 };
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const dayTabsContainer = document.getElementById('day-tabs');
+            const contentsContainer = document.getElementById('schedule-contents-container');
+
+            // --- レッスン表示関数 ---
+            function renderLessons(dayKey) {
+                contentsContainer.innerHTML = '';
+                const lessons = lessonsData[dayKey] || [];
+                const dayName = weekdays.find((name, index) => dayOrder[name] === parseInt(dayKey));
+
+                if (lessons.length > 0) {
+                    const lessonsList = document.createElement('div');
+                    lessonsList.className = 'space-y-4';
+                    lessons.forEach(lesson => {
+                        const instructorInfo = instructorData[lesson.instructorId];
+                        const photoSrc = instructorInfo ? instructorInfo.photo : `https://placehold.co/80x80/DDDDDD/333333?text=${lesson.instructor.substring(0,2)}`;
+                        const lessonElement = document.createElement('div');
+                        // デザインに合わせたリストアイテム
+                        lessonElement.className = 'bg-white p-5 border-2 border-gray-100 flex flex-col md:flex-row items-center justify-between gap-6 hover:border-joy-red hover:shadow-lg transition-all duration-300 group rounded';
+                        lessonElement.innerHTML = `
+                            <div class="flex-1 text-center md:text-left w-full">
+                                <p class="font-noto-black text-2xl font-bold text-joy-red tracking-tight">${lesson.time}</p>
+                                <div class="flex flex-col md:flex-row items-center justify-center md:justify-start md:items-baseline mt-1">
+                                    <p class="font-noto-black text-lg font-bold text-gray-800">${lesson.name}</p>
+                                    <div class="text-amber-500 text-base md:ml-3">${'★'.repeat(lesson.stars)}</div>
+                                </div>
+                                <button class="instructor-trigger inline-flex items-center mt-3 text-gray-500 hover:text-joy-red transition-colors" data-instructor-id="${lesson.instructorId}">
+                                    <span class="font-bold mr-2 text-[10px] text-joy-red border border-joy-red px-2 py-0.5 rounded">INSTRUCTOR</span>
+                                    <img src="${photoSrc}" alt="${lesson.instructor}" class="w-8 h-8 rounded-full object-cover mr-2 border border-gray-300">
+                                    <span class="font-bold underline decoration-dotted text-sm">${lesson.instructor}</span>
+                                </button>
+                            </div>
+                            <div class="w-full md:w-auto">
+                                <!-- 体験予約ボタンに新しいシンプルクラスを適用 -->
+                                <button class="booking-btn btn-simple-racing w-full md:w-auto text-sm" data-lesson-name="${lesson.name}" data-lesson-time="${lesson.time}" data-lesson-day="${dayName}" data-day-index="${dayKey}" data-lesson-instructor="${lesson.instructor}">体験予約</button>
+                            </div>
+                        `;
+                        lessonsList.appendChild(lessonElement);
+                    });
+                    contentsContainer.appendChild(lessonsList);
+                } else {
+                     const noLessonElement = document.createElement('div');
+                    noLessonElement.className = 'text-center py-12 bg-gray-50 rounded mt-4 border border-dashed border-gray-300';
+                    noLessonElement.innerHTML = `<p class="font-bold text-gray-400">スタッフ不在日のため、本日のレッスンはございません。</p>`;
+                    contentsContainer.appendChild(noLessonElement);
+                }
+                bindModalEvents();
+            }
+            
+            // --- 曜日タブ生成 ---
+            const availableDays = [ {name:'火', key: 2}, {name:'水', key: 3}, {name:'金', key: 5}, {name:'土', key: 6}, {name:'日', key: 0} ];
+            availableDays.forEach(day => {
+                const tabButton = document.createElement('button');
+                tabButton.className = 'tab-btn';
+                tabButton.textContent = day.name;
+                tabButton.dataset.dayKey = day.key;
+                dayTabsContainer.appendChild(tabButton);
+            });
+
+            const tabButtons = document.querySelectorAll('.tab-btn');
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    tabButtons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+                    renderLessons(button.dataset.dayKey);
+                });
+            });
+
+            if(tabButtons.length > 0) {
+                tabButtons[0].click();
+            }
+
+            // --- モーダル制御 ---
+            const bookingModal = document.getElementById('booking-modal');
+            const instructorModal = document.getElementById('instructor-modal');
+            const bookingModalContent = document.getElementById('modal-content');
+            const instructorModalContent = document.getElementById('instructor-modal-content');
+            const closeBookingModalBtn = document.getElementById('close-modal-btn');
+            const closeSuccessBtn = document.getElementById('close-success-btn');
+            const bookingForm = document.getElementById('booking-form');
+            const formView = document.getElementById('form-view');
+            const successMessage = document.getElementById('success-message');
+            const submitBtn = document.getElementById('submit-btn');
+            const closeInstructorModalBtn = document.getElementById('close-instructor-modal-btn');
+            const instructorDetailsContainer = document.getElementById('instructor-details-container');
+            
+            function generateDateOptions(dayIndex) {
+                const selectElement = document.getElementById('desired-date');
+                selectElement.innerHTML = ''; 
+                const today = new Date();
+                const targetMonth = 11; // 12月
+                let currentDate = new Date(today.getFullYear(), targetMonth, 1);
+
+                if (currentDate.getDay() !== dayIndex) {
+                    currentDate.setDate(currentDate.getDate() + (dayIndex - currentDate.getDay() + 7) % 7);
+                }
+
+                let count = 0;
+                while (currentDate.getMonth() === targetMonth) {
+                    if (currentDate >= today) {
+                        count++;
+                        const year = currentDate.getFullYear();
+                        const month = currentDate.getMonth() + 1;
+                        const day = currentDate.getDate();
+                        const displayFormat = `${month}月${day}日 (${weekdays[dayIndex]})`;
+                        const valueFormat = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                        const option = document.createElement('option');
+                        option.value = valueFormat;
+                        option.textContent = displayFormat;
+                        selectElement.appendChild(option);
+                    }
+                    currentDate.setDate(currentDate.getDate() + 7);
+                }
+                 if (count === 0) {
+                    const option = document.createElement('option');
+                    option.value = "";
+                    option.textContent = "今月中の開催はありません";
+                    option.disabled = true;
+                    selectElement.appendChild(option);
+                 }
+            }
+            
+            function bindModalEvents() {
+                // イベントリスナー重複防止のためクローンで置換
+                const newBookingBtns = [];
+                document.querySelectorAll('.booking-btn').forEach(btn => {
+                    const newBtn = btn.cloneNode(true);
+                    btn.parentNode.replaceChild(newBtn, btn);
+                    newBookingBtns.push(newBtn);
+                });
+                
+                const newInstructorBtns = [];
+                document.querySelectorAll('.instructor-trigger').forEach(btn => {
+                    const newBtn = btn.cloneNode(true);
+                    btn.parentNode.replaceChild(newBtn, btn);
+                    newInstructorBtns.push(newBtn);
+                });
+                
+                newBookingBtns.forEach(button => {
+                    button.addEventListener('click', function() {
+                        const lessonName = this.dataset.lessonName;
+                        const lessonTime = this.dataset.lessonTime;
+                        const lessonDay = this.dataset.lessonDay;
+                        const lessonInstructor = this.dataset.lessonInstructor;
+                        const dayIndex = parseInt(this.dataset.dayIndex, 10);
+
+                        generateDateOptions(dayIndex);
+
+                        document.getElementById('modal-lesson-day-time').textContent = `${lessonDay} ${lessonTime}`;
+                        document.getElementById('modal-lesson-name').textContent = lessonName;
+                        document.getElementById('modal-lesson-instructor').textContent = `担当: ${lessonInstructor}`;
+                        
+                        document.getElementById('lesson-name-hidden').value = lessonName;
+                        document.getElementById('lesson-time').value = lessonTime;
+                        document.getElementById('lesson-day').value = lessonDay;
+                        
+                        formView.classList.remove('hidden');
+                        successMessage.classList.add('hidden');
+                        bookingForm.reset();
+                        
+                        bookingModal.classList.remove('invisible', 'opacity-0');
+                        setTimeout(() => { bookingModalContent.classList.remove('scale-95', 'opacity-0'); }, 10);
+                    });
+                });
+
+                newInstructorBtns.forEach(button => {
+                    button.addEventListener('click', function() {
+                        const instructorId = this.dataset.instructorId;
+                        const instructor = instructorData[instructorId];
+                        if (!instructor) return;
+                        
+                        const instructorLessons = [];
+                        Object.keys(lessonsData).forEach(dayKey => {
+                            lessonsData[dayKey].forEach(lesson => {
+                                if (lesson.instructorId === instructorId) {
+                                    const dayName = weekdays.find((name, index) => dayOrder[name] === parseInt(dayKey));
+                                    instructorLessons.push({ name: lesson.name, day: dayName, time: lesson.time });
+                                }
+                            });
+                        });
+                        
+                        let lessonsHtml = instructorLessons.map(lesson => {
+                            return `<div class="mt-2 p-3 bg-gray-50 border-l-4 border-joy-red shadow-sm"><h4 class="font-bold text-gray-800">${lesson.name}</h4><p class="text-xs font-bold text-gray-500 mt-1">${lesson.day} ${lesson.time}</p></div>`;
+                        }).join('');
+
+                        instructorDetailsContainer.innerHTML = `
+                            <div class="text-center">
+                                <h3 class="text-3xl font-black text-joy-red mb-6 tracking-tight">${instructor.name}</h3>
+                                <div class="text-left bg-white p-2"><h4 class="text-lg font-bold border-b border-gray-200 pb-2 mb-4 text-gray-700">担当レッスン</h4>${lessonsHtml}</div>
+                            </div>
+                        `;
+                        
+                        instructorModal.classList.remove('invisible', 'opacity-0');
+                        setTimeout(() => { instructorModalContent.classList.remove('scale-95', 'opacity-0'); }, 10);
+                    });
+                });
+            }
+
+            function closeModal(modal, content) {
+                content.classList.add('scale-95', 'opacity-0');
+                setTimeout(() => { modal.classList.add('invisible', 'opacity-0'); }, 300);
+            }
+
+            closeBookingModalBtn.addEventListener('click', () => closeModal(bookingModal, bookingModalContent));
+            closeSuccessBtn.addEventListener('click', () => closeModal(bookingModal, bookingModalContent));
+            bookingModal.addEventListener('click', (e) => { if (e.target === bookingModal) closeModal(bookingModal, bookingModalContent); });
+            closeInstructorModalBtn.addEventListener('click', () => closeModal(instructorModal, instructorModalContent));
+            instructorModal.addEventListener('click', (e) => { if (e.target === instructorModal) closeModal(instructorModal, instructorModalContent); });
+
+            const GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbx5Kd9J2rVUy_uG7Zg3liiVKf1O9Y0Eg5mAirwETVlpunnal4YvjNuip8oc8DPRKqCp/exec';
+            bookingForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const formData = new FormData(bookingForm);
+                const data = Object.fromEntries(formData.entries());
+                
+                submitBtn.disabled = true;
+                submitBtn.textContent = '送信中...';
+
+                fetch(GAS_WEB_APP_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                })
+                .then(() => {
+                    formView.classList.add('hidden');
+                    successMessage.classList.remove('hidden');
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('送信エラーが発生しました');
+                })
+                .finally(() => {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'このレッスンに申し込む';
+                });
+            });
+        });
+    </script>
+</body>
+</html>
