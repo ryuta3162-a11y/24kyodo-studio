@@ -133,6 +133,23 @@ body {
 
 .dow-strip-btn:hover { color: var(--ink); }
 
+/* 土曜＝青・日曜＝赤（カレンダー慣習） */
+.dow-strip-btn.dow-sat:not(.active) .ds-char { color: #2563b8; }
+.dow-strip-btn.dow-sun:not(.active) .ds-char { color: var(--joy); }
+
+.dow-strip-btn.dow-sat:not(.active) .ds-sub { color: #2563b8; opacity: 0.75; }
+.dow-strip-btn.dow-sun:not(.active) .ds-sub { color: var(--joy); opacity: 0.75; }
+
+.dow-strip-btn.dow-sat:not(.active) .ds-count {
+  color: #2563b8;
+  background: #eff6ff;
+}
+
+.dow-strip-btn.dow-sun:not(.active) .ds-count {
+  color: var(--joy);
+  background: var(--joy-soft);
+}
+
 .dow-strip-btn.active {
   background: var(--surface);
   color: var(--joy);
@@ -140,7 +157,33 @@ body {
   font-weight: 700;
 }
 
-.dow-strip-btn.weekend:not(.active) { color: #c08080; }
+.dow-strip-btn.dow-sat.active {
+  color: #2563b8;
+  background: #eff6ff;
+  box-shadow: 0 2px 10px rgba(37, 99, 184, 0.18);
+}
+
+.dow-strip-btn.dow-sat.active .ds-char,
+.dow-strip-btn.dow-sat.active .ds-sub { color: #2563b8; }
+
+.dow-strip-btn.dow-sat.active .ds-count {
+  background: #2563b8;
+  color: #fff;
+}
+
+.dow-strip-btn.dow-sun.active {
+  color: var(--joy);
+  background: var(--joy-soft);
+  box-shadow: 0 2px 10px var(--joy-glow);
+}
+
+.dow-strip-btn.dow-sun.active .ds-char,
+.dow-strip-btn.dow-sun.active .ds-sub { color: var(--joy); }
+
+.dow-strip-btn.dow-sun.active .ds-count {
+  background: var(--joy);
+  color: #fff;
+}
 
 .ds-char {
   font-size: 15px;
@@ -167,7 +210,7 @@ body {
   margin-top: 2px;
 }
 
-.dow-strip-btn.active .ds-count {
+.dow-strip-btn.active:not(.dow-sat):not(.dow-sun) .ds-count {
   background: var(--joy);
   color: #fff;
 }

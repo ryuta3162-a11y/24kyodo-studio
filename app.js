@@ -207,7 +207,8 @@ function renderDowStrip(container, { active = null, pickMode = false, onSelect }
     btn.type = 'button';
     btn.className = 'dow-strip-btn';
     if (dow === active) btn.classList.add('active');
-    if (dow === '土' || dow === '日') btn.classList.add('weekend');
+    if (dow === '土') btn.classList.add('dow-sat');
+    if (dow === '日') btn.classList.add('dow-sun');
     btn.innerHTML = pickMode
       ? `<span class="ds-char">${dow}</span><span class="ds-sub">${DOW_LABEL[dow] || ''}</span><span class="ds-count">${count}</span>`
       : `<span class="ds-char">${dow}</span>`;
