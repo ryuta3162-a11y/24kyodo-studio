@@ -21,8 +21,10 @@ const els = {
   stepSubmitting: document.getElementById('step-submitting'),
   stepSuccess: document.getElementById('step-success'),
   dowTabs: document.getElementById('dow-tabs'),
+  dowQuick: document.getElementById('dow-quick'),
   lessonList: document.getElementById('lesson-list'),
   selectedDowLabel: document.getElementById('selected-dow-label'),
+  selectedDowCount: document.getElementById('selected-dow-count'),
   selectedLessonSummary: document.getElementById('selected-lesson-summary'),
   dateList: document.getElementById('date-list'),
   selectedSummary: document.getElementById('selected-summary'),
@@ -208,51 +210,99 @@ function renderDowTabs() {
   });
 }
 
+function parseTimeMin(t) {
+  const [h, m] = String(t).split(':').map(Number);
+  return h * 60 + (m || 0);
+}
+
+function calcDuration(start, end) {
+  const mins = parseTimeMin(end) - parseTimeMin(start);
+  return mins > 0 ? `${mins}分` : '';
+}
+
+function renderDowQuick(activeDow) {
+  if (!els.dowQuick) return;
+  els.dowQuick.innerHTML = '';
+  getAvailableDows().forEach((dow) => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = `dow-quick-btn${dow === activeDow ? ' active' : ''}`;
+    btn.textContent = dow;
+    btn.addEventListener('click', () => {
+      if (dow !== activeDow) {
+        state.selectedDow = dow;
+        renderLessons(dow);
+      }
+    });
+    els.dowQuick.appendChild(btn);
+  });
+}
+
+function buildLessonCard(tpl, dow, dates, index) {
+  const duration = calcDuration(tpl.start, tpl.end);
+  const card = document.createElement('article');
+  card.className = 'lesson-card';
+  card.style.animationDelay = `${index * 0.05}s`;
+  card.setAttribute('role', 'button');
+  card.setAttribute('tabindex', '0');
+
+  const tags = [
+    tpl.stars ? `<span class="tag tag-level">${escapeHtml(tpl.stars)}</span>` : '',
+    duration ? `<span class="tag tag-duration">${duration}</span>` : '',
+    tpl.note ? `<span class="tag tag-note">${escapeHtml(tpl.note)}</span>` : '',
+  ].filter(Boolean).join('');
+
+  card.innerHTML = `
+    <div class="lesson-time-col">
+      <span class="lesson-start">${tpl.start}</span>
+      <span class="lesson-time-line"></span>
+      <span class="lesson-end">${tpl.end}</span>
+    </div>
+    <div class="lesson-body">
+      <p class="lesson-name">${escapeHtml(tpl.lessonName)}</p>
+      <div class="lesson-footer">
+        <span class="lesson-instructor">${escapeHtml(tpl.instructor)}</span>
+        ${tags ? `<div class="lesson-tags">${tags}</div>` : ''}
+      </div>
+    </div>
+    <span class="lesson-chevron" aria-hidden="true">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </span>
+  `;
+
+  const select = () => {
+    state.selectedTemplate = tpl;
+    state.selectedBooking = null;
+    renderDatesForLesson(dow, tpl, dates);
+    showPanel('date');
+  };
+
+  card.addEventListener('click', select);
+  card.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      select();
+    }
+  });
+
+  return card;
+}
+
 function renderLessons(dow) {
-  els.selectedDowLabel.textContent = DOW_FULL[dow] || dow;
+  els.selectedDowLabel.textContent = `${DOW_FULL[dow] || dow}のレッスン`;
+  const count = countLessonsForDow(dow);
+  if (els.selectedDowCount) els.selectedDowCount.textContent = `${count}クラス`;
+  renderDowQuick(dow);
   els.lessonList.innerHTML = '';
 
   const schedule = state.data.scheduleByDow[dow] || [];
+  let index = 0;
   schedule.forEach((tpl) => {
     const dates = state.data.bookable.filter(
       (b) => b.dow === dow && b.start === tpl.start && b.end === tpl.end && b.lessonName === tpl.lessonName
     );
     if (dates.length === 0) return;
-
-    const card = document.createElement('article');
-    card.className = 'lesson-card';
-    card.setAttribute('role', 'button');
-    card.setAttribute('tabindex', '0');
-    card.innerHTML = `
-      <div class="lesson-card-accent"></div>
-      <div class="lesson-card-body">
-        <p class="lesson-time">${tpl.start} – ${tpl.end}</p>
-        <p class="lesson-name">${escapeHtml(tpl.lessonName)}</p>
-        <div class="lesson-meta">
-          <span class="lesson-stars">${escapeHtml(tpl.stars)}</span>
-          <span class="lesson-instructor-name">${escapeHtml(tpl.instructor)}</span>
-        </div>
-        ${tpl.note ? `<p class="lesson-note">${escapeHtml(tpl.note)}</p>` : ''}
-      </div>
-      <span class="lesson-card-arrow" aria-hidden="true">›</span>
-    `;
-
-    const select = () => {
-      state.selectedTemplate = tpl;
-      state.selectedBooking = null;
-      renderDatesForLesson(dow, tpl, dates);
-      showPanel('date');
-    };
-
-    card.addEventListener('click', select);
-    card.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        select();
-      }
-    });
-
-    els.lessonList.appendChild(card);
+    els.lessonList.appendChild(buildLessonCard(tpl, dow, dates, index++));
   });
 
   if (!els.lessonList.children.length) {
@@ -261,21 +311,33 @@ function renderLessons(dow) {
 }
 
 function renderDatesForLesson(dow, tpl, dates) {
+  const duration = calcDuration(tpl.start, tpl.end);
   els.selectedLessonSummary.innerHTML = `
-    <strong>${DOW_FULL[dow] || dow} ${tpl.start}–${tpl.end}</strong><br>
-    ${escapeHtml(tpl.lessonName)}
+    <div class="recap-time">${tpl.start}<span>–</span>${tpl.end}${duration ? `<em>${duration}</em>` : ''}</div>
+    <div class="recap-name">${escapeHtml(tpl.lessonName)}</div>
+    <div class="recap-meta">${escapeHtml(tpl.instructor)}${tpl.stars ? ` · ${escapeHtml(tpl.stars)}` : ''}</div>
   `;
   els.dateList.innerHTML = '';
   dates.forEach((slot) => {
+    const parts = slot.dateLabel.match(/(\d+)月(\d+)日(?:\((.)\))?/);
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.className = 'date-btn';
-    btn.textContent = slot.dateLabel;
+    if (parts) {
+      btn.innerHTML = `
+        <span class="date-btn-dow">${parts[3] || ''}</span>
+        <span class="date-btn-day">${parts[2]}</span>
+        <span class="date-btn-month">${parts[1]}月</span>
+      `;
+    } else {
+      btn.textContent = slot.dateLabel;
+    }
     btn.addEventListener('click', () => {
       state.selectedBooking = slot;
       els.selectedSummary.innerHTML = `
-        <strong>${slot.dateLabel}</strong> ${slot.start}–${slot.end}<br>
-        ${escapeHtml(slot.lessonName)}
+        <div class="recap-time">${slot.dateLabel} ${slot.start}<span>–</span>${slot.end}</div>
+        <div class="recap-name">${escapeHtml(slot.lessonName)}</div>
+        <div class="recap-meta">${escapeHtml(slot.instructor)}</div>
       `;
       showPanel('form');
     });
@@ -361,7 +423,7 @@ function restart() {
   showPanel('dow');
 }
 
-document.querySelectorAll('.link-back').forEach((btn) => {
+document.querySelectorAll('.btn-icon-back, .link-back').forEach((btn) => {
   btn.addEventListener('click', () => {
     const target = btn.dataset.back;
     if (target === 'dow') showPanel('dow');

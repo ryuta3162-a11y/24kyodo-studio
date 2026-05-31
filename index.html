@@ -40,22 +40,42 @@
             </div>
 
             <div id="step-lesson" class="step-panel hidden">
-              <button type="button" class="link-back" data-back="dow">← 曜日に戻る</button>
-              <p class="step-heading"><span id="selected-dow-label"></span>のレッスン</p>
+              <div class="step-toolbar">
+                <button type="button" class="btn-icon-back" data-back="dow" aria-label="曜日に戻る">
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 3L5 8l5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </button>
+                <div class="step-toolbar-text">
+                  <span class="step-toolbar-title" id="selected-dow-label"></span>
+                  <span class="step-toolbar-sub" id="selected-dow-count"></span>
+                </div>
+              </div>
+              <div id="dow-quick" class="dow-quick"></div>
               <div id="lesson-list" class="lesson-list"></div>
             </div>
 
             <div id="step-date" class="step-panel hidden">
-              <button type="button" class="link-back" data-back="lesson">← レッスンに戻る</button>
-              <p class="step-heading">日付を選択</p>
-              <div class="selected-lesson-summary" id="selected-lesson-summary"></div>
+              <div class="step-toolbar">
+                <button type="button" class="btn-icon-back" data-back="lesson" aria-label="レッスンに戻る">
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 3L5 8l5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </button>
+                <div class="step-toolbar-text">
+                  <span class="step-toolbar-title">日付を選択</span>
+                </div>
+              </div>
+              <div class="lesson-recap" id="selected-lesson-summary"></div>
               <div id="date-list" class="date-list"></div>
             </div>
 
             <div id="step-form" class="step-panel hidden">
-              <button type="button" class="link-back" data-back="date">← 日付に戻る</button>
-              <p class="step-heading">お客様情報</p>
-              <div class="selected-summary" id="selected-summary"></div>
+              <div class="step-toolbar">
+                <button type="button" class="btn-icon-back" data-back="date" aria-label="日付に戻る">
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 3L5 8l5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </button>
+                <div class="step-toolbar-text">
+                  <span class="step-toolbar-title">お客様情報</span>
+                </div>
+              </div>
+              <div class="lesson-recap lesson-recap-compact" id="selected-summary"></div>
               <form id="booking-form" class="form">
                 <label>お名前 <span class="req">必須</span>
                   <input type="text" name="name" required autocomplete="name" placeholder="山田 花子">
