@@ -20,76 +20,75 @@
     <main>
       <section class="booking-section" id="booking">
         <div class="booking-card">
-          <div class="progress-bar" aria-hidden="true">
-            <div class="progress-fill" id="progress-fill"></div>
-          </div>
-          <ol class="booking-steps" aria-label="予約ステップ">
-            <li class="booking-step active" data-step="1">曜日</li>
-            <li class="booking-step" data-step="2">レッスン</li>
-            <li class="booking-step" data-step="3">日付</li>
-            <li class="booking-step" data-step="4">情報</li>
-          </ol>
-
           <div class="booking-body">
             <div id="loading" class="state-msg">読み込み中…</div>
             <div id="error" class="state-msg state-error hidden"></div>
 
-            <div id="step-dow" class="step-panel hidden">
-              <p class="step-hint">体験したい曜日を選んでください</p>
-              <div id="dow-tabs" class="dow-strip dow-strip--pick"></div>
-            </div>
-
-            <div id="step-lesson" class="step-panel hidden">
-              <div id="dow-quick" class="dow-strip"></div>
-              <p class="lesson-list-label" id="lesson-list-label"></p>
-              <div id="lesson-list" class="lesson-list"></div>
-            </div>
-
-            <div id="step-date" class="step-panel hidden">
-              <div class="step-toolbar">
-                <button type="button" class="btn-icon-back" data-back="lesson" aria-label="レッスンに戻る">
-                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 3L5 8l5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                </button>
-                <div class="step-toolbar-text">
-                  <span class="step-toolbar-title">日付を選択</span>
+            <div id="form-flow" class="form-flow hidden">
+              <div class="flow-section is-active" id="section-dow" data-step="1">
+                <div class="flow-heading">
+                  <span class="flow-num">1</span>
+                  <span class="flow-title">曜日</span>
+                </div>
+                <div class="flow-body">
+                  <p class="flow-hint">体験したい曜日を選んでください</p>
+                  <div id="dow-tabs" class="dow-strip dow-strip--pick"></div>
                 </div>
               </div>
-              <div class="lesson-recap" id="selected-lesson-summary"></div>
-              <div id="date-list" class="date-list"></div>
-            </div>
 
-            <div id="step-form" class="step-panel hidden">
-              <div class="step-toolbar">
-                <button type="button" class="btn-icon-back" data-back="date" aria-label="日付に戻る">
-                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 3L5 8l5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                </button>
-                <div class="step-toolbar-text">
-                  <span class="step-toolbar-title">お客様情報</span>
+              <div class="flow-section flow-section--locked" id="section-lesson" data-step="2">
+                <div class="flow-heading">
+                  <span class="flow-num">2</span>
+                  <span class="flow-title">レッスン</span>
+                </div>
+                <div class="flow-body">
+                  <p class="lesson-list-label" id="lesson-list-label"></p>
+                  <div id="lesson-list" class="lesson-list"></div>
                 </div>
               </div>
-              <div class="lesson-recap lesson-recap-compact" id="selected-summary"></div>
-              <form id="booking-form" class="form">
-                <label>お名前 <span class="req">必須</span>
-                  <input type="text" name="name" required autocomplete="name" placeholder="山田 花子">
-                </label>
-                <label>電話番号 <span class="req">必須</span>
-                  <input type="tel" name="phone" required autocomplete="tel" placeholder="090-1234-5678">
-                </label>
-                <label>メールアドレス <span class="req">必須</span>
-                  <input type="email" name="email" required autocomplete="email" placeholder="example@email.com">
-                </label>
-                <label>ご質問・ご要望
-                  <textarea name="note" rows="3" placeholder="初めてのヨガです、など"></textarea>
-                </label>
-                <button type="submit" class="btn-primary btn-full" id="submit-btn">この内容で申し込む</button>
-              </form>
+
+              <div class="flow-section flow-section--locked" id="section-date" data-step="3">
+                <div class="flow-heading">
+                  <span class="flow-num">3</span>
+                  <span class="flow-title">日付</span>
+                </div>
+                <div class="flow-body">
+                  <div class="lesson-recap" id="selected-lesson-summary"></div>
+                  <div id="date-list" class="date-list"></div>
+                </div>
+              </div>
+
+              <div class="flow-section flow-section--locked" id="section-form" data-step="4">
+                <div class="flow-heading">
+                  <span class="flow-num">4</span>
+                  <span class="flow-title">情報</span>
+                </div>
+                <div class="flow-body">
+                  <div class="lesson-recap lesson-recap-compact" id="selected-summary"></div>
+                  <form id="booking-form" class="form">
+                    <label>お名前 <span class="req">必須</span>
+                      <input type="text" name="name" required autocomplete="name" placeholder="山田 花子">
+                    </label>
+                    <label>電話番号 <span class="req">必須</span>
+                      <input type="tel" name="phone" required autocomplete="tel" placeholder="090-1234-5678">
+                    </label>
+                    <label>メールアドレス <span class="req">必須</span>
+                      <input type="email" name="email" required autocomplete="email" placeholder="example@email.com">
+                    </label>
+                    <label>ご質問・ご要望
+                      <textarea name="note" rows="3" placeholder="初めてのヨガです、など"></textarea>
+                    </label>
+                    <button type="submit" class="btn-primary btn-full" id="submit-btn">この内容で申し込む</button>
+                  </form>
+                </div>
+              </div>
             </div>
 
-            <div id="step-submitting" class="step-panel hidden">
+            <div id="step-submitting" class="state-panel hidden">
               <div class="state-msg">申し込みを送信しています…</div>
             </div>
 
-            <div id="step-success" class="step-panel hidden">
+            <div id="step-success" class="state-panel hidden">
               <div class="success-box">
                 <p class="success-icon">✓</p>
                 <h3>お申し込みを受け付けました</h3>

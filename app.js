@@ -10,18 +10,17 @@ const DOW_LABEL = { 月: 'Mon', 火: 'Tue', 水: 'Wed', 木: 'Thu', 金: 'Fri', 
 const els = {
   loading: document.getElementById('loading'),
   error: document.getElementById('error'),
-  progressFill: document.getElementById('progress-fill'),
+  formFlow: document.getElementById('form-flow'),
   teamGrid: document.getElementById('team-grid'),
   teamsToggle: document.getElementById('teams-toggle'),
   teamsPanel: document.getElementById('teams-panel'),
-  stepDow: document.getElementById('step-dow'),
-  stepLesson: document.getElementById('step-lesson'),
-  stepDate: document.getElementById('step-date'),
-  stepForm: document.getElementById('step-form'),
+  sectionDow: document.getElementById('section-dow'),
+  sectionLesson: document.getElementById('section-lesson'),
+  sectionDate: document.getElementById('section-date'),
+  sectionForm: document.getElementById('section-form'),
   stepSubmitting: document.getElementById('step-submitting'),
   stepSuccess: document.getElementById('step-success'),
   dowTabs: document.getElementById('dow-tabs'),
-  dowQuick: document.getElementById('dow-quick'),
   lessonList: document.getElementById('lesson-list'),
   lessonListLabel: document.getElementById('lesson-list-label'),
   selectedLessonSummary: document.getElementById('selected-lesson-summary'),
@@ -31,31 +30,37 @@ const els = {
   form: document.getElementById('booking-form'),
   submitBtn: document.getElementById('submit-btn'),
   restartBtn: document.getElementById('restart-btn'),
-  steps: document.querySelectorAll('.booking-step'),
 };
 
 const DOW_FULL = { 月: '月曜日', 火: '火曜日', 水: '水曜日', 木: '木曜日', 金: '金曜日', 土: '土曜日', 日: '日曜日' };
 
-function showPanel(name) {
-  const panels = {
-    dow: els.stepDow,
-    lesson: els.stepLesson,
-    date: els.stepDate,
-    form: els.stepForm,
-    submitting: els.stepSubmitting,
-    success: els.stepSuccess,
-  };
-  Object.entries(panels).forEach(([n, el]) => el.classList.toggle('hidden', n !== name));
+function scrollToSection(id) {
+  const el = document.getElementById(id);
+  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
 
-  const stepNum = { dow: 1, lesson: 2, date: 3, form: 4, submitting: 4, success: 4 }[name];
-  const progress = { dow: 25, lesson: 50, date: 75, form: 100, submitting: 100, success: 100 }[name];
-  if (els.progressFill) els.progressFill.style.width = `${progress}%`;
+function updateFlowState() {
+  const { selectedDow, selectedTemplate, selectedBooking } = state;
 
-  els.steps.forEach((s) => {
-    const n = parseInt(s.dataset.step, 10);
-    s.classList.toggle('active', n === stepNum && name !== 'success');
-    s.classList.toggle('done', n < stepNum || name === 'success');
-  });
+  els.sectionDow.classList.toggle('is-complete', !!selectedDow);
+  els.sectionDow.classList.toggle('is-active', !selectedDow);
+
+  els.sectionLesson.classList.toggle('flow-section--locked', !selectedDow);
+  els.sectionLesson.classList.toggle('is-complete', !!selectedTemplate);
+  els.sectionLesson.classList.toggle('is-active', !!selectedDow && !selectedTemplate);
+
+  els.sectionDate.classList.toggle('flow-section--locked', !selectedTemplate);
+  els.sectionDate.classList.toggle('is-complete', !!selectedBooking);
+  els.sectionDate.classList.toggle('is-active', !!selectedTemplate && !selectedBooking);
+
+  els.sectionForm.classList.toggle('flow-section--locked', !selectedBooking);
+  els.sectionForm.classList.toggle('is-active', !!selectedBooking);
+}
+
+function showStatePanel(name) {
+  els.formFlow.classList.toggle('hidden', name !== 'flow');
+  els.stepSubmitting.classList.toggle('hidden', name !== 'submitting');
+  els.stepSuccess.classList.toggle('hidden', name !== 'success');
 }
 
 function countLessonsForDow(dow) {
@@ -203,60 +208,50 @@ function calcDuration(start, end) {
   return mins > 0 ? `${mins}分` : '';
 }
 
-function renderDowStrip(container, { active = null, pickMode = false, onSelect }) {
-  if (!container) return;
-  container.innerHTML = '';
-  container.className = pickMode ? 'dow-strip dow-strip--pick' : 'dow-strip';
+function renderDowStrip() {
+  els.dowTabs.innerHTML = '';
+  els.dowTabs.className = 'dow-strip dow-strip--pick';
 
   getAvailableDows().forEach((dow) => {
     const count = countLessonsForDow(dow);
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.className = 'dow-strip-btn';
-    if (dow === active) btn.classList.add('active');
+    if (dow === state.selectedDow) btn.classList.add('active');
     if (dow === '土') btn.classList.add('dow-sat');
     if (dow === '日') btn.classList.add('dow-sun');
-    btn.innerHTML = pickMode
-      ? `<span class="ds-char">${dow}</span><span class="ds-sub">${DOW_LABEL[dow] || ''}</span><span class="ds-count">${count}</span>`
-      : `<span class="ds-char">${dow}</span>`;
-    btn.addEventListener('click', () => onSelect(dow));
-    container.appendChild(btn);
-  });
-}
-
-function renderDowTabs() {
-  renderDowStrip(els.dowTabs, {
-    pickMode: true,
-    onSelect: (dow) => {
+    btn.innerHTML = `
+      <span class="ds-char">${dow}</span>
+      <span class="ds-sub">${DOW_LABEL[dow] || ''}</span>
+      <span class="ds-count">${count}</span>
+    `;
+    btn.addEventListener('click', () => {
       state.selectedDow = dow;
       state.selectedTemplate = null;
       state.selectedBooking = null;
+      renderDowStrip();
       renderLessons(dow);
-      showPanel('lesson');
-    },
-  });
-}
-
-function renderDowQuick(activeDow) {
-  renderDowStrip(els.dowQuick, {
-    active: activeDow,
-    onSelect: (dow) => {
-      if (dow === activeDow) {
-        showPanel('dow');
-        return;
-      }
-      state.selectedDow = dow;
-      renderLessons(dow);
-    },
+      els.selectedLessonSummary.innerHTML = '';
+      els.dateList.innerHTML = '';
+      els.selectedSummary.innerHTML = '';
+      updateFlowState();
+      scrollToSection('section-lesson');
+    });
+    els.dowTabs.appendChild(btn);
   });
 }
 
 function buildLessonCard(tpl, dow, dates, index) {
   const duration = calcDuration(tpl.start, tpl.end);
+  const isSelected = state.selectedTemplate
+    && state.selectedTemplate.start === tpl.start
+    && state.selectedTemplate.end === tpl.end
+    && state.selectedTemplate.lessonName === tpl.lessonName;
+
   const card = document.createElement('article');
-  card.className = 'lesson-card';
+  card.className = 'lesson-card' + (isSelected ? ' is-selected' : '');
   card.dataset.dow = dow;
-  card.style.animationDelay = `${index * 0.06}s`;
+  card.style.animationDelay = `${index * 0.04}s`;
   card.setAttribute('role', 'button');
   card.setAttribute('tabindex', '0');
 
@@ -275,16 +270,16 @@ function buildLessonCard(tpl, dow, dates, index) {
       <p class="lc-inst">${escapeHtml(tpl.instructor)}</p>
       ${meta ? `<div class="lc-meta">${meta}</div>` : ''}
     </div>
-    <span class="lc-arrow" aria-hidden="true">
-      <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M7 5l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    </span>
+    <span class="lc-check" aria-hidden="true">${isSelected ? '✓' : ''}</span>
   `;
 
   const select = () => {
     state.selectedTemplate = tpl;
     state.selectedBooking = null;
+    renderLessons(dow);
     renderDatesForLesson(dow, tpl, dates);
-    showPanel('date');
+    updateFlowState();
+    scrollToSection('section-date');
   };
 
   card.addEventListener('click', select);
@@ -307,7 +302,6 @@ function renderLessons(dow) {
     else if (dow === '日') els.lessonListLabel.classList.add('label-sun');
     else els.lessonListLabel.classList.add('label-wday');
   }
-  renderDowQuick(dow);
   els.lessonList.innerHTML = '';
 
   const schedule = state.data.scheduleByDow[dow] || [];
@@ -333,6 +327,7 @@ function renderDatesForLesson(dow, tpl, dates) {
     <div class="recap-meta">${escapeHtml(tpl.instructor)}${tpl.stars ? ` · ${escapeHtml(tpl.stars)}` : ''}</div>
   `;
   els.dateList.innerHTML = '';
+
   dates.forEach((slot) => {
     const parts = slot.dateLabel.match(/(\d+)月(\d+)日(?:（(.)）|\((.)\))?/);
     const btn = document.createElement('button');
@@ -340,6 +335,10 @@ function renderDatesForLesson(dow, tpl, dates) {
     btn.className = 'date-btn';
     if (slot.dow === '土') btn.classList.add('date-sat');
     if (slot.dow === '日') btn.classList.add('date-sun');
+    if (state.selectedBooking?.date === slot.date
+      && state.selectedBooking?.start === slot.start) {
+      btn.classList.add('is-selected');
+    }
 
     if (parts) {
       const wd = parts[3] || parts[4] || slot.dow || '';
@@ -353,12 +352,15 @@ function renderDatesForLesson(dow, tpl, dates) {
 
     btn.addEventListener('click', () => {
       state.selectedBooking = slot;
+      els.dateList.querySelectorAll('.date-btn').forEach((b) => b.classList.remove('is-selected'));
+      btn.classList.add('is-selected');
       els.selectedSummary.innerHTML = `
         <div class="recap-time">${slot.dateLabel} ${slot.start}<span>–</span>${slot.end}</div>
         <div class="recap-name">${escapeHtml(slot.lessonName)}</div>
         <div class="recap-meta">${escapeHtml(slot.instructor)}</div>
       `;
-      showPanel('form');
+      updateFlowState();
+      scrollToSection('section-form');
     });
     els.dateList.appendChild(btn);
   });
@@ -396,7 +398,7 @@ async function handleSubmit(e) {
   };
 
   els.submitBtn.disabled = true;
-  showPanel('submitting');
+  showStatePanel('submitting');
 
   try {
     const res = await fetch('/api/book', {
@@ -415,10 +417,11 @@ async function handleSubmit(e) {
       <dt>電話番号</dt><dd>${escapeHtml(payload.phone)}</dd>
       <dt>メール</dt><dd>${escapeHtml(payload.email)}</dd>
     `;
-    showPanel('success');
+    showStatePanel('success');
   } catch (err) {
-    showPanel('form');
+    showStatePanel('flow');
     showFormError(err.message);
+    scrollToSection('section-form');
   } finally {
     els.submitBtn.disabled = false;
   }
@@ -438,18 +441,16 @@ function restart() {
   state.selectedBooking = null;
   els.form.reset();
   clearFormError();
-  renderDowTabs();
-  showPanel('dow');
+  els.selectedLessonSummary.innerHTML = '';
+  els.dateList.innerHTML = '';
+  els.selectedSummary.innerHTML = '';
+  els.lessonList.innerHTML = '';
+  if (els.lessonListLabel) els.lessonListLabel.textContent = '';
+  renderDowStrip();
+  updateFlowState();
+  showStatePanel('flow');
+  scrollToSection('section-dow');
 }
-
-document.querySelectorAll('.btn-icon-back, .link-back').forEach((btn) => {
-  btn.addEventListener('click', () => {
-    const target = btn.dataset.back;
-    if (target === 'dow') showPanel('dow');
-    else if (target === 'lesson') showPanel('lesson');
-    else showPanel('date');
-  });
-});
 
 els.form.addEventListener('submit', handleSubmit);
 els.restartBtn.addEventListener('click', restart);
@@ -461,9 +462,11 @@ async function init() {
     if (!res.ok) throw new Error('予約可能レッスンを読み込めませんでした');
     state.data = await res.json();
     els.loading.classList.add('hidden');
-    renderDowTabs();
+    els.formFlow.classList.remove('hidden');
+    renderDowStrip();
     renderTeam();
-    showPanel('dow');
+    updateFlowState();
+    showStatePanel('flow');
   } catch (err) {
     els.loading.classList.add('hidden');
     els.error.classList.remove('hidden');
