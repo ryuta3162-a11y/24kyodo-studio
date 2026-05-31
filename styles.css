@@ -74,16 +74,6 @@ body {
   overflow: hidden;
 }
 
-.progress-bar { height: 3px; background: var(--line); }
-.progress-fill {
-  height: 100%;
-  background: linear-gradient(90deg, var(--joy-dark), var(--joy), #ff6080);
-  width: 25%;
-  transition: width 0.4s cubic-bezier(.4,0,.2,1);
-}
-
-.booking-step.done { color: #555; }
-
 .booking-body { padding: 18px 16px 22px; }
 
 /* ── Vertical Form Flow ── */
