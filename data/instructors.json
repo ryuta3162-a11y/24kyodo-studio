@@ -1,0 +1,17 @@
+[
+  { "id": "yukie", "name": "行徳 由岐恵", "display": "YUKI", "role": "インストラクター", "photo": "assets/instructors/YUKI.png" },
+  { "id": "mie", "name": "石田 美絵", "display": "MIE", "role": "インストラクター", "photo": "assets/instructors/MIE.png" },
+  { "id": "nakata", "name": "中田 花子", "display": "Hana", "role": "インストラクター", "photo": "assets/instructors/Hana.png" },
+  { "id": "hachiya", "name": "蜂谷 有加", "display": "HACHI", "role": "インストラクター", "photo": "" },
+  { "id": "mariko", "name": "Mariko", "display": "Mariko", "role": "インストラクター", "photo": "assets/instructors/Mariko.png" },
+  { "id": "kikuchi", "name": "菊池 智子", "display": "菊池 智子", "role": "インストラクター", "photo": "assets/instructors/kikuchi.png" },
+  { "id": "nakashima", "name": "ナカシマ トオル", "display": "ナカシマ トオル", "role": "インストラクター", "photo": "assets/instructors/nakashima.png" },
+  { "id": "kanako", "name": "kanako", "display": "kanako", "role": "インストラクター", "photo": "assets/instructors/kanako.png" },
+  { "id": "goto", "name": "後藤 亜也", "display": "後藤 亜也", "role": "インストラクター", "photo": "assets/instructors/goto.png" },
+  { "id": "emi", "name": "EMI", "display": "EMI", "role": "インストラクター", "photo": "assets/instructors/EMI.png" },
+  { "id": "itsuku", "name": "itsuku", "display": "itsuku", "role": "インストラクター", "photo": "assets/instructors/itsuku.png" },
+  { "id": "bando", "name": "坂東", "display": "坂東", "role": "インストラクター", "photo": "assets/instructors/bando.png" },
+  { "id": "takako", "name": "takako", "display": "takako", "role": "インストラクター", "photo": "assets/instructors/takako.png" },
+  { "id": "kato", "name": "加藤 早莉", "display": "加藤 早莉", "role": "インストラクター", "photo": "" },
+  { "id": "yoko", "name": "YOKO", "display": "YOKO", "role": "インストラクター", "photo": "" }
+]

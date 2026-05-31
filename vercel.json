@@ -1,0 +1,8 @@
+{
+  "version": 2,
+  "outputDirectory": ".",
+  "functions": {
+    "api/slots.js": { "memory": 128, "maxDuration": 10 },
+    "api/book.js": { "memory": 128, "maxDuration": 30 }
+  }
+}
