@@ -163,7 +163,14 @@ async function renderTeam() {
       ul.className = 'team-lessons';
       lessons.forEach((l) => {
         const li = document.createElement('li');
-        li.innerHTML = `<span class="tl-dow">${l.dow}</span><span class="tl-time">${l.start}</span><span class="tl-name">${escapeHtml(l.lessonName)}</span>`;
+        const dowClass = l.dow === '土' ? 'tl-dow-sat' : l.dow === '日' ? 'tl-dow-sun' : '';
+        li.innerHTML = `
+          <span class="tl-row">
+            <span class="tl-dow ${dowClass}">${l.dow}</span>
+            <span class="tl-time">${l.start}</span>
+          </span>
+          <span class="tl-name">${escapeHtml(l.lessonName)}</span>
+        `;
         ul.appendChild(li);
       });
       card.appendChild(ul);
