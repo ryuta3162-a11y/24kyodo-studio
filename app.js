@@ -327,19 +327,23 @@ function renderDatesForLesson(dow, tpl, dates) {
   `;
   els.dateList.innerHTML = '';
   dates.forEach((slot) => {
-    const parts = slot.dateLabel.match(/(\d+)月(\d+)日(?:\((.)\))?/);
+    const parts = slot.dateLabel.match(/(\d+)月(\d+)日(?:（(.)）|\((.)\))?/);
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.className = 'date-btn';
+    if (slot.dow === '土') btn.classList.add('date-sat');
+    if (slot.dow === '日') btn.classList.add('date-sun');
+
     if (parts) {
+      const wd = parts[3] || parts[4] || slot.dow || '';
       btn.innerHTML = `
-        <span class="date-btn-dow">${parts[3] || ''}</span>
-        <span class="date-btn-day">${parts[2]}</span>
-        <span class="date-btn-month">${parts[1]}月</span>
+        <span class="date-btn-label">${parts[1]}月${parts[2]}日</span>
+        ${wd ? `<span class="date-btn-wd">（${wd}）</span>` : ''}
       `;
     } else {
-      btn.textContent = slot.dateLabel;
+      btn.innerHTML = `<span class="date-btn-label">${escapeHtml(slot.dateLabel)}</span>`;
     }
+
     btn.addEventListener('click', () => {
       state.selectedBooking = slot;
       els.selectedSummary.innerHTML = `

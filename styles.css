@@ -467,56 +467,68 @@ body {
 
 .date-list {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 8px;
 }
 
 .date-btn {
   display: flex;
-  flex-direction: column;
-  align-items: center;
+  flex-wrap: wrap;
+  align-items: baseline;
   justify-content: center;
-  padding: 14px 6px 12px;
-  min-height: 80px;
+  gap: 0 2px;
+  padding: 16px 10px;
   border: 1.5px solid var(--line);
-  border-radius: 12px;
+  border-radius: var(--radius-sm);
   background: var(--surface);
   cursor: pointer;
   font-family: inherit;
-  transition: all 0.15s;
+  transition: all 0.18s;
+  line-height: 1.3;
 }
 
+.date-btn-label {
+  font-size: 16px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+  letter-spacing: 0.02em;
+}
+
+.date-btn-wd {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.date-btn.date-sat .date-btn-label,
+.date-btn.date-sat .date-btn-wd { color: var(--sat); }
+
+.date-btn.date-sun .date-btn-label,
+.date-btn.date-sun .date-btn-wd { color: var(--sun); }
+
 .date-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+}
+
+.date-btn:not(.date-sat):not(.date-sun):hover {
   border-color: var(--joy);
   background: var(--joy-soft);
-  transform: translateY(-2px);
   box-shadow: 0 4px 16px var(--joy-glow);
 }
 
-.date-btn-dow {
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--joy);
-  margin-bottom: 2px;
+.date-btn.date-sat:hover {
+  border-color: var(--sat);
+  background: var(--sat-soft);
+  box-shadow: 0 4px 16px var(--sat-glow);
 }
 
-.date-btn:hover .date-btn-dow { color: var(--joy); }
-
-.date-btn-day {
-  font-size: 26px;
-  font-weight: 700;
-  line-height: 1;
-  color: var(--ink);
-  font-variant-numeric: tabular-nums;
+.date-btn.date-sun:hover {
+  border-color: var(--sun);
+  background: var(--sun-soft);
+  box-shadow: 0 4px 16px var(--joy-glow);
 }
-
-.date-btn-month {
-  font-size: 10px;
-  color: var(--muted);
-  margin-top: 3px;
-}
-
-.date-btn:hover .date-btn-day { color: var(--joy); }
 
 /* ── Form ── */
 .form { display: flex; flex-direction: column; gap: 14px; }
