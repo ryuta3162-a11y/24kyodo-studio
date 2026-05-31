@@ -39,22 +39,45 @@ function scrollToSection(id) {
   if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
+function revealSection(el) {
+  if (!el || !el.classList.contains('hidden')) return;
+  el.classList.remove('hidden');
+  el.classList.remove('is-revealing');
+  void el.offsetWidth;
+  el.classList.add('is-revealing');
+}
+
 function updateFlowState() {
   const { selectedDow, selectedTemplate, selectedBooking } = state;
 
   els.sectionDow.classList.toggle('is-complete', !!selectedDow);
   els.sectionDow.classList.toggle('is-active', !selectedDow);
 
-  els.sectionLesson.classList.toggle('flow-section--locked', !selectedDow);
-  els.sectionLesson.classList.toggle('is-complete', !!selectedTemplate);
-  els.sectionLesson.classList.toggle('is-active', !!selectedDow && !selectedTemplate);
+  if (selectedDow) {
+    revealSection(els.sectionLesson);
+    els.sectionLesson.classList.toggle('is-complete', !!selectedTemplate);
+    els.sectionLesson.classList.toggle('is-active', !selectedTemplate);
+  } else {
+    els.sectionLesson.classList.add('hidden');
+    els.sectionDate.classList.add('hidden');
+    els.sectionForm.classList.add('hidden');
+  }
 
-  els.sectionDate.classList.toggle('flow-section--locked', !selectedTemplate);
-  els.sectionDate.classList.toggle('is-complete', !!selectedBooking);
-  els.sectionDate.classList.toggle('is-active', !!selectedTemplate && !selectedBooking);
+  if (selectedTemplate) {
+    revealSection(els.sectionDate);
+    els.sectionDate.classList.toggle('is-complete', !!selectedBooking);
+    els.sectionDate.classList.toggle('is-active', !selectedBooking);
+  } else if (selectedDow) {
+    els.sectionDate.classList.add('hidden');
+    els.sectionForm.classList.add('hidden');
+  }
 
-  els.sectionForm.classList.toggle('flow-section--locked', !selectedBooking);
-  els.sectionForm.classList.toggle('is-active', !!selectedBooking);
+  if (selectedBooking) {
+    revealSection(els.sectionForm);
+    els.sectionForm.classList.add('is-active');
+  } else if (selectedTemplate) {
+    els.sectionForm.classList.add('hidden');
+  }
 }
 
 function showStatePanel(name) {
