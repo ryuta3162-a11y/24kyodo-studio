@@ -11,65 +11,47 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <header class="hero">
-    <div class="hero-inner">
-      <p class="hero-brand">JOYFIT24 <span>経堂</span></p>
-      <h1>ホットスタジオ<br>ヨガ無料体験のご予約</h1>
-      <p class="hero-lead">レッスン表のヨガクラスから、ご希望の体験レッスンをお選びください。</p>
-    </div>
-  </header>
-
   <main>
-    <section class="section" id="team">
-      <div class="section-head">
-        <p class="section-label">TEAM</p>
-        <h2>経堂スタジオのインストラクター</h2>
-      </div>
-      <div id="team-grid" class="team-grid"></div>
-    </section>
+    <section class="booking-hero" id="booking">
+      <header class="booking-hero-head">
+        <p class="site-brand">JOYFIT24 <span>経堂</span></p>
+        <h1>ホットスタジオ ヨガ無料体験</h1>
+        <p class="site-lead">曜日を選び、体験したいレッスンをお選びください</p>
+      </header>
 
-    <section class="section section-booking" id="booking">
-      <div class="section-head">
-        <p class="section-label">RESERVATION</p>
-        <h2>体験レッスンの予約</h2>
-        <p class="section-desc">対象月：<span id="month-label">読込中…</span></p>
-      </div>
-
-      <div class="booking-layout">
-        <aside class="booking-aside">
-          <ol class="booking-steps">
-            <li class="booking-step active" data-step="1"><span>1</span>曜日</li>
-            <li class="booking-step" data-step="2"><span>2</span>レッスン</li>
-            <li class="booking-step" data-step="3"><span>3</span>日付</li>
-            <li class="booking-step" data-step="4"><span>4</span>お客様情報</li>
-          </ol>
-        </aside>
+      <div class="booking-shell">
+        <ol class="booking-steps" aria-label="予約ステップ">
+          <li class="booking-step active" data-step="1"><span>1</span>曜日</li>
+          <li class="booking-step" data-step="2"><span>2</span>レッスン</li>
+          <li class="booking-step" data-step="3"><span>3</span>日付</li>
+          <li class="booking-step" data-step="4"><span>4</span>情報</li>
+        </ol>
 
         <div class="booking-panel">
           <div id="loading" class="state-msg">予約可能レッスンを読み込んでいます…</div>
           <div id="error" class="state-msg state-error hidden"></div>
 
           <div id="step-dow" class="step-panel hidden">
-            <h3>曜日を選択</h3>
+            <h3 class="step-title">曜日を選択</h3>
             <div id="dow-tabs" class="dow-tabs"></div>
           </div>
 
           <div id="step-lesson" class="step-panel hidden">
             <button type="button" class="link-back" data-back="dow">← 曜日に戻る</button>
-            <h3><span id="selected-dow-label"></span>のレッスン</h3>
+            <h3 class="step-title"><span id="selected-dow-label"></span>のレッスン</h3>
             <div id="lesson-list" class="lesson-list"></div>
           </div>
 
           <div id="step-date" class="step-panel hidden">
             <button type="button" class="link-back" data-back="lesson">← レッスンに戻る</button>
-            <h3>日付を選択</h3>
+            <h3 class="step-title">日付を選択</h3>
             <div class="selected-lesson-summary" id="selected-lesson-summary"></div>
             <div id="date-list" class="date-list"></div>
           </div>
 
           <div id="step-form" class="step-panel hidden">
             <button type="button" class="link-back" data-back="date">← 日付に戻る</button>
-            <h3>お客様情報</h3>
+            <h3 class="step-title">お客様情報</h3>
             <div class="selected-summary" id="selected-summary"></div>
             <form id="booking-form" class="form">
               <label>お名前 <span class="req">必須</span>
@@ -102,6 +84,20 @@
             </div>
           </div>
         </div>
+      </div>
+    </section>
+
+    <section class="teams-section" id="team">
+      <button type="button" class="teams-banner" id="teams-toggle" aria-expanded="false" aria-controls="teams-panel">
+        <span class="teams-banner-inner">
+          <span class="teams-banner-label">TEAMS</span>
+          <span class="teams-banner-title">インストラクター紹介</span>
+        </span>
+        <span class="teams-banner-chevron" aria-hidden="true"></span>
+      </button>
+      <div class="teams-panel" id="teams-panel" hidden>
+        <p class="teams-desc">共同スタジオのインストラクターと担当レッスン</p>
+        <div id="team-grid" class="team-grid"></div>
       </div>
     </section>
 

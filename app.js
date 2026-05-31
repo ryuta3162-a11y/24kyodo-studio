@@ -1,22 +1,3 @@
-const INSTRUCTOR_PHOTOS = {
-  YUKI: 'assets/instructors/YUKI.png',
-  MIE: 'assets/instructors/MIE.png',
-  Hana: 'assets/instructors/Hana.png',
-  Mariko: 'assets/instructors/Mariko.png',
-  '菊池 智子': 'assets/instructors/kikuchi.png',
-  ナカシマトオル: 'assets/instructors/nakashima.png',
-  kanako: 'assets/instructors/kanako.png',
-  '後藤 亜也': 'assets/instructors/goto.png',
-  EMI: 'assets/instructors/EMI.png',
-  itsuku: 'assets/instructors/itsuku.png',
-  坂東: 'assets/instructors/bando.png',
-  takako: 'assets/instructors/takako.png',
-  '加藤 早莉': '',
-  YOKO: '',
-};
-
-const GUEST_ICON_SVG = `<div class="lesson-instructor-guest"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg></div>`;
-
 const state = {
   data: null,
   selectedDow: null,
@@ -27,8 +8,9 @@ const state = {
 const els = {
   loading: document.getElementById('loading'),
   error: document.getElementById('error'),
-  monthLabel: document.getElementById('month-label'),
   teamGrid: document.getElementById('team-grid'),
+  teamsToggle: document.getElementById('teams-toggle'),
+  teamsPanel: document.getElementById('teams-panel'),
   stepDow: document.getElementById('step-dow'),
   stepLesson: document.getElementById('step-lesson'),
   stepDate: document.getElementById('step-date'),
@@ -69,6 +51,48 @@ function showPanel(name) {
   });
 }
 
+function norm(s) {
+  return String(s).replace(/\s/g, '').toLowerCase();
+}
+
+function matchInstructor(scheduleName, person) {
+  const keys = [person.display, person.name, person.name.replace(/\s/g, '')].filter(Boolean);
+  const sn = norm(scheduleName);
+  return keys.some((k) => {
+    const nk = norm(k);
+    return nk === sn || sn.includes(nk) || nk.includes(sn);
+  });
+}
+
+function buildInstructorLessons() {
+  const map = new Map();
+  if (!state.data?.scheduleByDow) return map;
+
+  Object.entries(state.data.scheduleByDow).forEach(([dow, lessons]) => {
+    lessons.forEach((tpl) => {
+      const hasBookable = state.data.bookable.some(
+        (b) => b.dow === dow && b.start === tpl.start && b.end === tpl.end && b.lessonName === tpl.lessonName
+      );
+      if (!hasBookable) return;
+
+      const key = tpl.instructor;
+      if (!map.has(key)) map.set(key, []);
+      map.get(key).push({ dow, start: tpl.start, end: tpl.end, lessonName: tpl.lessonName });
+    });
+  });
+
+  map.forEach((lessons) => {
+    const dowOrder = state.data.dowOrder || [];
+    lessons.sort((a, b) => {
+      const di = dowOrder.indexOf(a.dow) - dowOrder.indexOf(b.dow);
+      if (di !== 0) return di;
+      return a.start.localeCompare(b.start);
+    });
+  });
+
+  return map;
+}
+
 function makeGuestIcon() {
   const div = document.createElement('div');
   div.className = 'team-guest-icon';
@@ -80,10 +104,19 @@ async function renderTeam() {
   try {
     const res = await fetch('data/instructors.json');
     const list = await res.json();
+    const lessonMap = buildInstructorLessons();
     els.teamGrid.innerHTML = '';
+
     list.forEach((person) => {
+      const lessons = [];
+      lessonMap.forEach((items, instructorKey) => {
+        if (matchInstructor(instructorKey, person)) lessons.push(...items);
+      });
+      if (lessons.length === 0) return;
+
       const card = document.createElement('article');
       card.className = 'team-card';
+
       const photoWrap = document.createElement('div');
       photoWrap.className = 'team-photo-wrap';
       if (person.photo) {
@@ -97,21 +130,39 @@ async function renderTeam() {
         photoWrap.appendChild(makeGuestIcon());
       }
       card.appendChild(photoWrap);
+
       const nameEl = document.createElement('p');
       nameEl.className = 'team-name';
       nameEl.textContent = person.name;
       card.appendChild(nameEl);
+
       if (person.display && person.display !== person.name) {
         const d = document.createElement('p');
         d.className = 'team-display';
         d.textContent = person.display;
         card.appendChild(d);
       }
+
+      const ul = document.createElement('ul');
+      ul.className = 'team-lessons';
+      lessons.forEach((l) => {
+        const li = document.createElement('li');
+        li.innerHTML = `<span class="tl-dow">${l.dow}</span><span class="tl-time">${l.start}</span><span class="tl-name">${escapeHtml(l.lessonName)}</span>`;
+        ul.appendChild(li);
+      });
+      card.appendChild(ul);
       els.teamGrid.appendChild(card);
     });
   } catch {
     els.teamGrid.innerHTML = '';
   }
+}
+
+function toggleTeams() {
+  const open = els.teamsToggle.getAttribute('aria-expanded') === 'true';
+  els.teamsToggle.setAttribute('aria-expanded', String(!open));
+  els.teamsPanel.hidden = open;
+  els.teamsPanel.classList.toggle('is-open', !open);
 }
 
 function getAvailableDows() {
@@ -150,32 +201,37 @@ function renderLessons(dow) {
 
     const card = document.createElement('article');
     card.className = 'lesson-card';
-
-    const photo = INSTRUCTOR_PHOTOS[tpl.instructor];
-    const photoHtml = photo
-      ? `<img src="${photo}" alt="${escapeHtml(tpl.instructor)}" class="lesson-instructor-photo" loading="lazy">`
-      : GUEST_ICON_SVG;
-
+    card.setAttribute('role', 'button');
+    card.setAttribute('tabindex', '0');
     card.innerHTML = `
-      <div class="lesson-card-main">
+      <div class="lesson-card-accent"></div>
+      <div class="lesson-card-body">
         <p class="lesson-time">${tpl.start} – ${tpl.end}</p>
         <p class="lesson-name">${escapeHtml(tpl.lessonName)}</p>
-        <p class="lesson-stars">${escapeHtml(tpl.stars)}</p>
-        <div class="lesson-instructor">
-          ${photoHtml}
-          <span>${escapeHtml(tpl.instructor)}</span>
+        <div class="lesson-meta">
+          <span class="lesson-stars">${escapeHtml(tpl.stars)}</span>
+          <span class="lesson-instructor-name">${escapeHtml(tpl.instructor)}</span>
         </div>
         ${tpl.note ? `<p class="lesson-note">${escapeHtml(tpl.note)}</p>` : ''}
       </div>
-      <button type="button" class="btn-primary lesson-select-btn">予約する</button>
+      <span class="lesson-card-arrow" aria-hidden="true">›</span>
     `;
 
-    card.querySelector('.lesson-select-btn').addEventListener('click', () => {
+    const select = () => {
       state.selectedTemplate = tpl;
       state.selectedBooking = null;
       renderDatesForLesson(dow, tpl, dates);
       showPanel('date');
+    };
+
+    card.addEventListener('click', select);
+    card.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        select();
+      }
     });
+
     els.lessonList.appendChild(card);
   });
 
@@ -187,20 +243,19 @@ function renderLessons(dow) {
 function renderDatesForLesson(dow, tpl, dates) {
   els.selectedLessonSummary.innerHTML = `
     <strong>${DOW_FULL[dow] || dow} ${tpl.start}–${tpl.end}</strong><br>
-    ${escapeHtml(tpl.lessonName)}（${escapeHtml(tpl.instructor)}）
+    ${escapeHtml(tpl.lessonName)}
   `;
   els.dateList.innerHTML = '';
   dates.forEach((slot) => {
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.className = 'date-btn';
-    btn.innerHTML = `<span>${slot.dateLabel}</span>`;
+    btn.textContent = slot.dateLabel;
     btn.addEventListener('click', () => {
       state.selectedBooking = slot;
       els.selectedSummary.innerHTML = `
-        <strong>${slot.dateLabel}</strong><br>
-        ${slot.start} – ${slot.end}<br>
-        ${escapeHtml(slot.lessonName)}（${escapeHtml(slot.instructor)}）
+        <strong>${slot.dateLabel}</strong> ${slot.start}–${slot.end}<br>
+        ${escapeHtml(slot.lessonName)}
       `;
       showPanel('form');
     });
@@ -297,16 +352,16 @@ document.querySelectorAll('.link-back').forEach((btn) => {
 
 els.form.addEventListener('submit', handleSubmit);
 els.restartBtn.addEventListener('click', restart);
+els.teamsToggle.addEventListener('click', toggleTeams);
 
 async function init() {
-  renderTeam();
   try {
     const res = await fetch('/api/slots');
     if (!res.ok) throw new Error('予約可能レッスンを読み込めませんでした');
     state.data = await res.json();
-    els.monthLabel.textContent = state.data.month;
     els.loading.classList.add('hidden');
     renderDowTabs();
+    renderTeam();
     showPanel('dow');
   } catch (err) {
     els.loading.classList.add('hidden');
