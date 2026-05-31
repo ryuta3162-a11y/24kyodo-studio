@@ -323,19 +323,136 @@ body {
   overflow-y: auto;
 }
 
-.time-btn {
-  padding: 12px 8px;
-  border: 1px solid var(--line);
+/* 曜日タブ */
+.dow-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.dow-tab {
+  min-width: 52px;
+  padding: 12px 20px;
+  border: 2px solid var(--line);
   border-radius: 10px;
   background: var(--surface);
-  cursor: pointer;
   font-family: inherit;
-  font-size: 15px;
-  font-weight: 600;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
   transition: all 0.15s;
 }
 
-.time-btn:hover { border-color: var(--joy); background: var(--joy-soft); color: var(--joy); }
+.dow-tab:hover {
+  border-color: var(--joy);
+  background: var(--joy-soft);
+  color: var(--joy);
+}
+
+/* レッスンカード */
+.lesson-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.lesson-card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--surface);
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+@media (min-width: 640px) {
+  .lesson-card {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+.lesson-card:hover {
+  border-color: var(--joy-soft);
+  box-shadow: var(--shadow);
+}
+
+.lesson-time {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--joy);
+  margin-bottom: 4px;
+}
+
+.lesson-name {
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.lesson-stars {
+  color: #d4a012;
+  font-size: 13px;
+  margin-bottom: 8px;
+}
+
+.lesson-instructor {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.lesson-instructor-photo {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--joy-soft);
+}
+
+.lesson-instructor-guest {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: #eee;
+}
+
+.lesson-instructor-guest .team-guest-icon svg {
+  width: 24px;
+  height: 24px;
+}
+
+.lesson-note {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 6px;
+}
+
+.lesson-select-btn {
+  flex-shrink: 0;
+  padding: 12px 24px;
+  font-size: 14px;
+}
+
+.selected-lesson-summary {
+  background: var(--joy-soft);
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin-bottom: 16px;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.hint {
+  font-size: 13px;
+  color: var(--muted);
+}
 
 .selected-summary {
   background: var(--joy-soft);

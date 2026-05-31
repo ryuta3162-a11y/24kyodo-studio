@@ -1,5 +1,5 @@
 /**
- * 6月シフト + レッスン表経堂 → 予約可能時間（2人以上60分空き）
+ * シフト + レッスン表 → 予約可能なヨガレッスン（レッスン表の枠そのまま）
  * 実行: node scripts/compute_slots.mjs
  */
 import fs from 'fs';
@@ -16,22 +16,14 @@ const OUT_JSON = path.join(ROOT, 'booking', 'slots.json');
 const TARGET_STAFF = ['蜂谷', '日下', '中田', '美絵', '由岐恵', '澤野'];
 const YEAR = 2026;
 const MONTH = 6;
-const SLOT_MIN = 60;
-const STEP_MIN = 15;
 const MIN_STAFF = 2;
-const GRID_START = 8 * 60;
-const GRID_END = 22 * 60;
 const MAX_TASK_MIN = 240;
-
-const DOW_CHARS = ['日', '月', '火', '水', '木', '金', '土'];
 
 const INSTRUCTOR_MAP = {
   YUKI: '由岐恵', Yuki: '由岐恵',
   MIE: '美絵', Mie: '美絵',
   HACHI: '蜂谷', Hachi: '蜂谷',
   Hana: '中田', HANA: '中田',
-  蜂谷: '蜂谷', 中田: '中田', 日下: '日下', 澤野: '澤野',
-  由岐恵: '由岐恵', 美絵: '美絵',
 };
 
 const OFF_RE = /^(休|公休|×|有休|有給|育休)$/;
@@ -71,19 +63,26 @@ function toFullWidthDigits(s) {
   return s.replace(/[０-９]/g, (c) => String.fromCharCode(c.charCodeAt(0) - 0xfee0));
 }
 
+function parseTime(str) {
+  const s = toFullWidthDigits(String(str || '')).trim();
+  const m = s.match(/(\d{1,2}):(\d{2})/);
+  if (!m) return null;
+  return parseInt(m[1], 10) * 60 + parseInt(m[2], 10);
+}
+
 function parseTimeRange(str) {
   if (!str) return null;
   const src = toFullWidthDigits(String(str))
     .replace(/\r?\n/g, ' ')
     .replace(/[：:]/g, ':')
     .replace(/[－ー〜～−‐—]/g, '-')
-    .replace(/\s+/g, ' ')
     .trim();
   const m = src.match(/(\d{1,2})(?::?(\d{2}))?\s*-\s*(\d{1,2})(?::?(\d{2}))?/);
   if (!m) return null;
-  const sh = parseInt(m[1], 10), sm = parseInt(m[2] || '0', 10);
-  const eh = parseInt(m[3], 10), em = parseInt(m[4] || '0', 10);
-  return { start: sh * 60 + sm, end: eh * 60 + em };
+  return {
+    start: parseInt(m[1], 10) * 60 + parseInt(m[2] || '0', 10),
+    end: parseInt(m[3], 10) * 60 + parseInt(m[4] || '0', 10),
+  };
 }
 
 function parseAllTimeRanges(str) {
@@ -118,7 +117,44 @@ function isOff(val) {
   return false;
 }
 
-function loadLessons() {
+/** ヨガレッスンのみ（ピラティスルーム・ピラティス系を除外） */
+function isYogaLesson(area, name) {
+  const a = String(area || '').trim();
+  const n = String(name || '').trim();
+  if (a.includes('ピラティス')) return false;
+  if (/ピラティス|サーキット|リズムステップ|フレッチャー/i.test(n)) return false;
+  return a.includes('ホット') || a.includes('スタジオ');
+}
+
+function loadYogaLessonsFromCsv() {
+  const rows = parseCsv(fs.readFileSync(LESSON_CSV, 'utf8'));
+  const templates = [];
+  for (let i = 1; i < rows.length; i++) {
+    const [dow, area, start, end, lessonName, stars, instructor, , note] = rows[i];
+    if (!dow || !isYogaLesson(area, lessonName)) continue;
+    const startMin = parseTime(start);
+    const endMin = parseTime(end);
+    if (startMin === null || endMin === null || endMin <= startMin) continue;
+    const d = String(dow).trim().charAt(0);
+    templates.push({
+      id: `${d}-${start}-${end}-${String(lessonName).slice(0, 12)}`.replace(/\s/g, ''),
+      dow: d,
+      area: String(area).trim(),
+      start: fmtMin(startMin),
+      end: fmtMin(endMin),
+      startMin,
+      endMin,
+      lessonName: String(lessonName).trim(),
+      stars: String(stars || '').trim(),
+      instructor: String(instructor || '').trim(),
+      note: String(note || '').trim(),
+    });
+  }
+  return templates;
+}
+
+/** スタッフのレッスン担当（シフト対象者のみ・空き判定用） */
+function loadStaffLessonsByDow() {
   const rows = parseCsv(fs.readFileSync(LESSON_CSV, 'utf8'));
   const byDow = {};
   for (let i = 1; i < rows.length; i++) {
@@ -168,12 +204,15 @@ function loadKyodoShifts(rows) {
     const memoRow = kyodoRows[i + 1];
     const shifts = [];
     for (const d of days) {
-      const shiftText = String(kyodoRows[i][d.col] || '').trim();
-      const memoText = memoRow ? String(memoRow[d.col] || '').trim() : '';
-      shifts.push({ day: d.day, dow: d.dow, shiftText, memoText });
+      shifts.push({
+        day: d.day,
+        dow: d.dow,
+        shiftText: String(kyodoRows[i][d.col] || '').trim(),
+        memoText: memoRow ? String(memoRow[d.col] || '').trim() : '',
+      });
     }
     staffData[name] = shifts;
-    i++; // skip memo row
+    i++;
   }
   return { days, staffData };
 }
@@ -186,9 +225,9 @@ function getWorkRange(shiftText, memoText) {
   return tr;
 }
 
-function getBusyBlocks(shiftText, memoText, work, lessonsForDay, staff) {
+function getBusyBlocks(shiftText, memoText, lessonsForDow, staff) {
   const busy = [];
-  for (const l of lessonsForDay) {
+  for (const l of lessonsForDow) {
     if (l.staff === staff) busy.push({ start: l.start, end: l.end });
   }
   const shiftRange = parseTimeRange(shiftText);
@@ -201,17 +240,7 @@ function getBusyBlocks(shiftText, memoText, work, lessonsForDay, staff) {
   return busy;
 }
 
-function staffFreeAt(staff, dayInfo, lessonsByDow) {
-  const { shiftText, memoText, dow } = dayInfo;
-  const work = getWorkRange(shiftText, memoText);
-  if (!work) return null;
-  const lessons = (lessonsByDow[dow] || []).filter((l) => l.staff === staff);
-  const busy = getBusyBlocks(shiftText, memoText, work, lessons, staff);
-  return { work, busy };
-}
-
-function isStaffAvailable(free, slotStart) {
-  const slotEnd = slotStart + SLOT_MIN;
+function isStaffFreeDuring(free, slotStart, slotEnd) {
   if (slotStart < free.work.start || slotEnd > free.work.end) return false;
   for (const b of free.busy) {
     if (overlaps(slotStart, slotEnd, b.start, b.end)) return false;
@@ -219,37 +248,64 @@ function isStaffAvailable(free, slotStart) {
   return true;
 }
 
+function countAvailableStaff(staffData, lessonsByDow, day, slotStart, slotEnd) {
+  let count = 0;
+  const available = [];
+  const dow = staffData[TARGET_STAFF[0]].find((x) => x.day === day)?.dow;
+  const lessonsForDow = lessonsByDow[dow] || [];
+
+  for (const staff of TARGET_STAFF) {
+    const dayInfo = staffData[staff].find((x) => x.day === day);
+    if (!dayInfo) continue;
+    const work = getWorkRange(dayInfo.shiftText, dayInfo.memoText);
+    if (!work) continue;
+    const busy = getBusyBlocks(dayInfo.shiftText, dayInfo.memoText, lessonsForDow, staff);
+    const free = { work, busy };
+    if (isStaffFreeDuring(free, slotStart, slotEnd)) {
+      count++;
+      available.push(staff);
+    }
+  }
+  return { count, available };
+}
+
 function main() {
   const shiftRows = parseCsv(fs.readFileSync(SHIFT_CSV, 'utf8'));
-  const lessonsByDow = loadLessons();
+  const templates = loadYogaLessonsFromCsv();
+  const lessonsByDow = loadStaffLessonsByDow();
   const { days, staffData } = loadKyodoShifts(shiftRows);
 
-  const slots = [];
+  const bookable = [];
 
   for (const d of days) {
-    const date = new Date(YEAR, MONTH - 1, d.day);
     const iso = `${YEAR}-${String(MONTH).padStart(2, '0')}-${String(d.day).padStart(2, '0')}`;
-    const label = `${MONTH}月${d.day}日（${d.dow}）`;
+    const dateLabel = `${MONTH}月${d.day}日（${d.dow}）`;
 
-    for (let t = GRID_START; t <= GRID_END - SLOT_MIN; t += STEP_MIN) {
-      let count = 0;
-      const available = [];
-      for (const staff of TARGET_STAFF) {
-        const dayInfo = staffData[staff].find((x) => x.day === d.day);
-        if (!dayInfo) continue;
-        const free = staffFreeAt(staff, dayInfo, lessonsByDow);
-        if (free && isStaffAvailable(free, t)) {
-          count++;
-          available.push(staff);
-        }
-      }
+    for (const tpl of templates) {
+      if (tpl.dow !== d.dow) continue;
+
+      const { count, available } = countAvailableStaff(
+        staffData,
+        lessonsByDow,
+        d.day,
+        tpl.startMin,
+        tpl.endMin
+      );
+
       if (count >= MIN_STAFF) {
-        slots.push({
+        bookable.push({
+          id: `${iso}-${tpl.id}`,
           date: iso,
-          label,
+          dateLabel,
           dow: d.dow,
-          start: fmtMin(t),
-          end: fmtMin(t + SLOT_MIN),
+          start: tpl.start,
+          end: tpl.end,
+          durationMin: tpl.endMin - tpl.startMin,
+          lessonName: tpl.lessonName,
+          stars: tpl.stars,
+          instructor: tpl.instructor,
+          area: tpl.area,
+          note: tpl.note,
           availableStaffCount: count,
           availableStaff: available,
         });
@@ -257,20 +313,36 @@ function main() {
     }
   }
 
+  const dowOrder = ['月', '火', '水', '木', '金', '土', '日'];
+  const scheduleByDow = {};
+  for (const tpl of templates) {
+    if (!scheduleByDow[tpl.dow]) scheduleByDow[tpl.dow] = [];
+    scheduleByDow[tpl.dow].push({
+      id: tpl.id,
+      start: tpl.start,
+      end: tpl.end,
+      lessonName: tpl.lessonName,
+      stars: tpl.stars,
+      instructor: tpl.instructor,
+      note: tpl.note,
+    });
+  }
+
   const output = {
     generatedAt: new Date().toISOString(),
     month: `${YEAR}年${MONTH}月`,
     store: '経堂',
-    slotDurationMin: SLOT_MIN,
+    type: 'yoga-lessons',
     minStaffAvailable: MIN_STAFF,
-    targetStaff: TARGET_STAFF,
-    totalSlots: slots.length,
-    slots,
+    scheduleByDow,
+    dowOrder,
+    totalBookable: bookable.length,
+    bookable,
   };
 
   fs.mkdirSync(path.dirname(OUT_JSON), { recursive: true });
   fs.writeFileSync(OUT_JSON, JSON.stringify(output, null, 2), 'utf8');
-  console.log(`Generated ${slots.length} bookable slots → ${OUT_JSON}`);
+  console.log(`Generated ${bookable.length} bookable yoga lessons → ${OUT_JSON}`);
 }
 
 main();

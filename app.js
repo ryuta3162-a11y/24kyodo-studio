@@ -1,6 +1,27 @@
+const INSTRUCTOR_PHOTOS = {
+  YUKI: 'assets/instructors/YUKI.png',
+  MIE: 'assets/instructors/MIE.png',
+  Hana: 'assets/instructors/Hana.png',
+  Mariko: 'assets/instructors/Mariko.png',
+  '菊池 智子': 'assets/instructors/kikuchi.png',
+  ナカシマトオル: 'assets/instructors/nakashima.png',
+  kanako: 'assets/instructors/kanako.png',
+  '後藤 亜也': 'assets/instructors/goto.png',
+  EMI: 'assets/instructors/EMI.png',
+  itsuku: 'assets/instructors/itsuku.png',
+  坂東: 'assets/instructors/bando.png',
+  takako: 'assets/instructors/takako.png',
+  '加藤 早莉': '',
+  YOKO: '',
+};
+
+const GUEST_ICON_SVG = `<div class="lesson-instructor-guest"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg></div>`;
+
 const state = {
   data: null,
-  selectedSlot: null,
+  selectedDow: null,
+  selectedTemplate: null,
+  selectedBooking: null,
 };
 
 const els = {
@@ -8,14 +29,17 @@ const els = {
   error: document.getElementById('error'),
   monthLabel: document.getElementById('month-label'),
   teamGrid: document.getElementById('team-grid'),
+  stepDow: document.getElementById('step-dow'),
+  stepLesson: document.getElementById('step-lesson'),
   stepDate: document.getElementById('step-date'),
-  stepTime: document.getElementById('step-time'),
   stepForm: document.getElementById('step-form'),
   stepSubmitting: document.getElementById('step-submitting'),
   stepSuccess: document.getElementById('step-success'),
+  dowTabs: document.getElementById('dow-tabs'),
+  lessonList: document.getElementById('lesson-list'),
+  selectedDowLabel: document.getElementById('selected-dow-label'),
+  selectedLessonSummary: document.getElementById('selected-lesson-summary'),
   dateList: document.getElementById('date-list'),
-  timeList: document.getElementById('time-list'),
-  selectedDateLabel: document.getElementById('selected-date-label'),
   selectedSummary: document.getElementById('selected-summary'),
   successDetails: document.getElementById('success-details'),
   form: document.getElementById('booking-form'),
@@ -24,17 +48,20 @@ const els = {
   steps: document.querySelectorAll('.booking-step'),
 };
 
+const DOW_FULL = { 月: '月曜日', 火: '火曜日', 水: '水曜日', 木: '木曜日', 金: '金曜日', 土: '土曜日', 日: '日曜日' };
+
 function showPanel(name) {
   const panels = {
+    dow: els.stepDow,
+    lesson: els.stepLesson,
     date: els.stepDate,
-    time: els.stepTime,
     form: els.stepForm,
     submitting: els.stepSubmitting,
     success: els.stepSuccess,
   };
   Object.entries(panels).forEach(([n, el]) => el.classList.toggle('hidden', n !== name));
 
-  const stepNum = { date: 1, time: 2, form: 3, submitting: 3, success: 3 }[name];
+  const stepNum = { dow: 1, lesson: 2, date: 3, form: 4, submitting: 4, success: 4 }[name];
   els.steps.forEach((s) => {
     const n = parseInt(s.dataset.step, 10);
     s.classList.toggle('active', n === stepNum && name !== 'success');
@@ -54,100 +81,131 @@ async function renderTeam() {
     const res = await fetch('data/instructors.json');
     const list = await res.json();
     els.teamGrid.innerHTML = '';
-
     list.forEach((person) => {
       const card = document.createElement('article');
       card.className = 'team-card';
-
       const photoWrap = document.createElement('div');
       photoWrap.className = 'team-photo-wrap';
-
-      const hasPhoto = person.photo && String(person.photo).trim();
-      if (hasPhoto) {
+      if (person.photo) {
         const img = document.createElement('img');
         img.src = person.photo;
         img.alt = person.name;
         img.loading = 'lazy';
-        img.onerror = () => {
-          img.replaceWith(makeGuestIcon());
-        };
+        img.onerror = () => img.replaceWith(makeGuestIcon());
         photoWrap.appendChild(img);
       } else {
         photoWrap.appendChild(makeGuestIcon());
       }
-
       card.appendChild(photoWrap);
-
       const nameEl = document.createElement('p');
       nameEl.className = 'team-name';
       nameEl.textContent = person.name;
       card.appendChild(nameEl);
-
       if (person.display && person.display !== person.name) {
-        const displayEl = document.createElement('p');
-        displayEl.className = 'team-display';
-        displayEl.textContent = person.display;
-        card.appendChild(displayEl);
+        const d = document.createElement('p');
+        d.className = 'team-display';
+        d.textContent = person.display;
+        card.appendChild(d);
       }
-
-      const roleEl = document.createElement('p');
-      roleEl.className = 'team-role';
-      roleEl.textContent = person.role;
-      card.appendChild(roleEl);
-
       els.teamGrid.appendChild(card);
     });
   } catch {
-    els.teamGrid.innerHTML = '<p class="section-desc">スタッフ情報を読み込めませんでした。</p>';
+    els.teamGrid.innerHTML = '';
   }
 }
 
-function groupByDate(slots) {
-  const map = new Map();
-  for (const slot of slots) {
-    if (!map.has(slot.date)) map.set(slot.date, { label: slot.label, slots: [] });
-    map.get(slot.date).slots.push(slot);
-  }
-  return map;
+function getAvailableDows() {
+  const dows = new Set(state.data.bookable.map((b) => b.dow));
+  return (state.data.dowOrder || []).filter((d) => dows.has(d));
 }
 
-function renderDates() {
-  const grouped = groupByDate(state.data.slots);
+function renderDowTabs() {
+  els.dowTabs.innerHTML = '';
+  getAvailableDows().forEach((dow) => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'dow-tab';
+    btn.textContent = dow;
+    btn.addEventListener('click', () => {
+      state.selectedDow = dow;
+      state.selectedTemplate = null;
+      state.selectedBooking = null;
+      renderLessons(dow);
+      showPanel('lesson');
+    });
+    els.dowTabs.appendChild(btn);
+  });
+}
+
+function renderLessons(dow) {
+  els.selectedDowLabel.textContent = DOW_FULL[dow] || dow;
+  els.lessonList.innerHTML = '';
+
+  const schedule = state.data.scheduleByDow[dow] || [];
+  schedule.forEach((tpl) => {
+    const dates = state.data.bookable.filter(
+      (b) => b.dow === dow && b.start === tpl.start && b.end === tpl.end && b.lessonName === tpl.lessonName
+    );
+    if (dates.length === 0) return;
+
+    const card = document.createElement('article');
+    card.className = 'lesson-card';
+
+    const photo = INSTRUCTOR_PHOTOS[tpl.instructor];
+    const photoHtml = photo
+      ? `<img src="${photo}" alt="${escapeHtml(tpl.instructor)}" class="lesson-instructor-photo" loading="lazy">`
+      : GUEST_ICON_SVG;
+
+    card.innerHTML = `
+      <div class="lesson-card-main">
+        <p class="lesson-time">${tpl.start} – ${tpl.end}</p>
+        <p class="lesson-name">${escapeHtml(tpl.lessonName)}</p>
+        <p class="lesson-stars">${escapeHtml(tpl.stars)}</p>
+        <div class="lesson-instructor">
+          ${photoHtml}
+          <span>${escapeHtml(tpl.instructor)}</span>
+        </div>
+        ${tpl.note ? `<p class="lesson-note">${escapeHtml(tpl.note)}</p>` : ''}
+      </div>
+      <button type="button" class="btn-primary lesson-select-btn">予約する</button>
+    `;
+
+    card.querySelector('.lesson-select-btn').addEventListener('click', () => {
+      state.selectedTemplate = tpl;
+      state.selectedBooking = null;
+      renderDatesForLesson(dow, tpl, dates);
+      showPanel('date');
+    });
+    els.lessonList.appendChild(card);
+  });
+
+  if (!els.lessonList.children.length) {
+    els.lessonList.innerHTML = '<p class="hint">この曜日は現在予約可能なヨガレッスンがありません。</p>';
+  }
+}
+
+function renderDatesForLesson(dow, tpl, dates) {
+  els.selectedLessonSummary.innerHTML = `
+    <strong>${DOW_FULL[dow] || dow} ${tpl.start}–${tpl.end}</strong><br>
+    ${escapeHtml(tpl.lessonName)}（${escapeHtml(tpl.instructor)}）
+  `;
   els.dateList.innerHTML = '';
-  for (const [, { label, slots }] of grouped) {
+  dates.forEach((slot) => {
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.className = 'date-btn';
-    btn.innerHTML = `<span>${label}</span><span class="count">${slots.length}枠</span>`;
+    btn.innerHTML = `<span>${slot.dateLabel}</span>`;
     btn.addEventListener('click', () => {
-      state.selectedSlot = null;
-      renderTimes(slots, label);
-      showPanel('time');
-    });
-    els.dateList.appendChild(btn);
-  }
-}
-
-function renderTimes(slots, label) {
-  els.selectedDateLabel.textContent = label + ' — 時間を選択';
-  els.timeList.innerHTML = '';
-  const seen = new Set();
-  for (const slot of slots) {
-    if (seen.has(slot.start)) continue;
-    seen.add(slot.start);
-    const btn = document.createElement('button');
-    btn.type = 'button';
-    btn.className = 'time-btn';
-    btn.textContent = slot.start;
-    btn.addEventListener('click', () => {
-      state.selectedSlot = slot;
-      clearFormError();
-      els.selectedSummary.innerHTML =
-        `<strong>${slot.label}</strong><br>${slot.start} 〜 ${slot.end}（60分）`;
+      state.selectedBooking = slot;
+      els.selectedSummary.innerHTML = `
+        <strong>${slot.dateLabel}</strong><br>
+        ${slot.start} – ${slot.end}<br>
+        ${escapeHtml(slot.lessonName)}（${escapeHtml(slot.instructor)}）
+      `;
       showPanel('form');
     });
-    els.timeList.appendChild(btn);
-  }
+    els.dateList.appendChild(btn);
+  });
 }
 
 function clearFormError() {
@@ -166,13 +224,15 @@ function showFormError(msg) {
 async function handleSubmit(e) {
   e.preventDefault();
   const fd = new FormData(els.form);
-  const slot = state.selectedSlot;
+  const slot = state.selectedBooking;
 
   const payload = {
     date: slot.date,
-    dateLabel: slot.label,
+    dateLabel: slot.dateLabel,
     start: slot.start,
     end: slot.end,
+    lessonName: slot.lessonName,
+    instructor: slot.instructor,
     name: fd.get('name'),
     phone: fd.get('phone'),
     email: fd.get('email'),
@@ -192,14 +252,14 @@ async function handleSubmit(e) {
     if (!res.ok || !data.ok) throw new Error(data.error || '送信に失敗しました');
 
     els.successDetails.innerHTML = `
-      <dt>日時</dt><dd>${escapeHtml(slot.label)} ${slot.start}〜${slot.end}</dd>
+      <dt>日時</dt><dd>${escapeHtml(slot.dateLabel)} ${slot.start}–${slot.end}</dd>
+      <dt>レッスン</dt><dd>${escapeHtml(slot.lessonName)}</dd>
+      <dt>担当</dt><dd>${escapeHtml(slot.instructor)}</dd>
       <dt>お名前</dt><dd>${escapeHtml(payload.name)}</dd>
       <dt>電話番号</dt><dd>${escapeHtml(payload.phone)}</dd>
       <dt>メール</dt><dd>${escapeHtml(payload.email)}</dd>
-      <dt>ステータス</dt><dd>${escapeHtml(data.status || '申請済み')}</dd>
     `;
     showPanel('success');
-    document.getElementById('booking').scrollIntoView({ behavior: 'smooth' });
   } catch (err) {
     showPanel('form');
     showFormError(err.message);
@@ -217,15 +277,21 @@ function escapeHtml(s) {
 }
 
 function restart() {
-  state.selectedSlot = null;
+  state.selectedDow = null;
+  state.selectedTemplate = null;
+  state.selectedBooking = null;
   els.form.reset();
   clearFormError();
-  showPanel('date');
+  renderDowTabs();
+  showPanel('dow');
 }
 
 document.querySelectorAll('.link-back').forEach((btn) => {
   btn.addEventListener('click', () => {
-    showPanel(btn.dataset.back === 'date' ? 'date' : 'time');
+    const target = btn.dataset.back;
+    if (target === 'dow') showPanel('dow');
+    else if (target === 'lesson') showPanel('lesson');
+    else showPanel('date');
   });
 });
 
@@ -236,12 +302,12 @@ async function init() {
   renderTeam();
   try {
     const res = await fetch('/api/slots');
-    if (!res.ok) throw new Error('予約可能時間を読み込めませんでした');
+    if (!res.ok) throw new Error('予約可能レッスンを読み込めませんでした');
     state.data = await res.json();
     els.monthLabel.textContent = state.data.month;
     els.loading.classList.add('hidden');
-    renderDates();
-    showPanel('date');
+    renderDowTabs();
+    showPanel('dow');
   } catch (err) {
     els.loading.classList.add('hidden');
     els.error.classList.remove('hidden');
