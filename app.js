@@ -5,9 +5,12 @@ const state = {
   selectedBooking: null,
 };
 
+const DOW_LABEL = { 月: 'Mon', 火: 'Tue', 水: 'Wed', 木: 'Thu', 金: 'Fri', 土: 'Sat', 日: 'Sun' };
+
 const els = {
   loading: document.getElementById('loading'),
   error: document.getElementById('error'),
+  progressFill: document.getElementById('progress-fill'),
   teamGrid: document.getElementById('team-grid'),
   teamsToggle: document.getElementById('teams-toggle'),
   teamsPanel: document.getElementById('teams-panel'),
@@ -44,11 +47,23 @@ function showPanel(name) {
   Object.entries(panels).forEach(([n, el]) => el.classList.toggle('hidden', n !== name));
 
   const stepNum = { dow: 1, lesson: 2, date: 3, form: 4, submitting: 4, success: 4 }[name];
+  const progress = { dow: 25, lesson: 50, date: 75, form: 100, submitting: 100, success: 100 }[name];
+  if (els.progressFill) els.progressFill.style.width = `${progress}%`;
+
   els.steps.forEach((s) => {
     const n = parseInt(s.dataset.step, 10);
     s.classList.toggle('active', n === stepNum && name !== 'success');
     s.classList.toggle('done', n < stepNum || name === 'success');
   });
+}
+
+function countLessonsForDow(dow) {
+  const schedule = state.data.scheduleByDow[dow] || [];
+  return schedule.filter((tpl) =>
+    state.data.bookable.some(
+      (b) => b.dow === dow && b.start === tpl.start && b.end === tpl.end && b.lessonName === tpl.lessonName
+    )
+  ).length;
 }
 
 function norm(s) {
@@ -173,10 +188,15 @@ function getAvailableDows() {
 function renderDowTabs() {
   els.dowTabs.innerHTML = '';
   getAvailableDows().forEach((dow) => {
+    const count = countLessonsForDow(dow);
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.className = 'dow-tab';
-    btn.textContent = dow;
+    btn.innerHTML = `
+      <span class="dow-tab-char">${dow}</span>
+      <span class="dow-tab-label">${DOW_LABEL[dow] || ''}</span>
+      <span class="dow-tab-count">${count}クラス</span>
+    `;
     btn.addEventListener('click', () => {
       state.selectedDow = dow;
       state.selectedTemplate = null;

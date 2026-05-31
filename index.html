@@ -11,140 +11,140 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <main>
-    <section class="booking-hero" id="booking">
-      <header class="booking-hero-head">
-        <p class="site-brand">JOYFIT24 <span>経堂</span></p>
-        <h1>ホットスタジオ ヨガ無料体験</h1>
-        <p class="site-lead">曜日を選び、体験したいレッスンをお選びください</p>
-      </header>
+  <div class="page">
+    <header class="page-header">
+      <p class="site-brand">JOYFIT24 <span>経堂</span></p>
+      <h1>ホットスタジオ ヨガ無料体験</h1>
+    </header>
 
-      <div class="booking-shell">
-        <ol class="booking-steps" aria-label="予約ステップ">
-          <li class="booking-step active" data-step="1"><span>1</span>曜日</li>
-          <li class="booking-step" data-step="2"><span>2</span>レッスン</li>
-          <li class="booking-step" data-step="3"><span>3</span>日付</li>
-          <li class="booking-step" data-step="4"><span>4</span>情報</li>
-        </ol>
-
-        <div class="booking-panel">
-          <div id="loading" class="state-msg">予約可能レッスンを読み込んでいます…</div>
-          <div id="error" class="state-msg state-error hidden"></div>
-
-          <div id="step-dow" class="step-panel hidden">
-            <h3 class="step-title">曜日を選択</h3>
-            <div id="dow-tabs" class="dow-tabs"></div>
+    <main>
+      <section class="booking-section" id="booking">
+        <div class="booking-card">
+          <div class="progress-bar" aria-hidden="true">
+            <div class="progress-fill" id="progress-fill"></div>
           </div>
+          <ol class="booking-steps" aria-label="予約ステップ">
+            <li class="booking-step active" data-step="1">曜日</li>
+            <li class="booking-step" data-step="2">レッスン</li>
+            <li class="booking-step" data-step="3">日付</li>
+            <li class="booking-step" data-step="4">情報</li>
+          </ol>
 
-          <div id="step-lesson" class="step-panel hidden">
-            <button type="button" class="link-back" data-back="dow">← 曜日に戻る</button>
-            <h3 class="step-title"><span id="selected-dow-label"></span>のレッスン</h3>
-            <div id="lesson-list" class="lesson-list"></div>
-          </div>
+          <div class="booking-body">
+            <div id="loading" class="state-msg">読み込み中…</div>
+            <div id="error" class="state-msg state-error hidden"></div>
 
-          <div id="step-date" class="step-panel hidden">
-            <button type="button" class="link-back" data-back="lesson">← レッスンに戻る</button>
-            <h3 class="step-title">日付を選択</h3>
-            <div class="selected-lesson-summary" id="selected-lesson-summary"></div>
-            <div id="date-list" class="date-list"></div>
-          </div>
+            <div id="step-dow" class="step-panel hidden">
+              <p class="step-hint">体験したい曜日をタップしてください</p>
+              <div id="dow-tabs" class="dow-tabs"></div>
+            </div>
 
-          <div id="step-form" class="step-panel hidden">
-            <button type="button" class="link-back" data-back="date">← 日付に戻る</button>
-            <h3 class="step-title">お客様情報</h3>
-            <div class="selected-summary" id="selected-summary"></div>
-            <form id="booking-form" class="form">
-              <label>お名前 <span class="req">必須</span>
-                <input type="text" name="name" required autocomplete="name" placeholder="山田 花子">
-              </label>
-              <label>電話番号 <span class="req">必須</span>
-                <input type="tel" name="phone" required autocomplete="tel" placeholder="090-1234-5678">
-              </label>
-              <label>メールアドレス <span class="req">必須</span>
-                <input type="email" name="email" required autocomplete="email" placeholder="example@email.com">
-              </label>
-              <label>ご質問・ご要望
-                <textarea name="note" rows="3" placeholder="初めてのヨガです、など"></textarea>
-              </label>
-              <button type="submit" class="btn-primary btn-full" id="submit-btn">この内容で申し込む</button>
-            </form>
-          </div>
+            <div id="step-lesson" class="step-panel hidden">
+              <button type="button" class="link-back" data-back="dow">← 曜日に戻る</button>
+              <p class="step-heading"><span id="selected-dow-label"></span>のレッスン</p>
+              <div id="lesson-list" class="lesson-list"></div>
+            </div>
 
-          <div id="step-submitting" class="step-panel hidden">
-            <div class="state-msg">申し込みを送信しています…</div>
-          </div>
+            <div id="step-date" class="step-panel hidden">
+              <button type="button" class="link-back" data-back="lesson">← レッスンに戻る</button>
+              <p class="step-heading">日付を選択</p>
+              <div class="selected-lesson-summary" id="selected-lesson-summary"></div>
+              <div id="date-list" class="date-list"></div>
+            </div>
 
-          <div id="step-success" class="step-panel hidden">
-            <div class="success-box">
-              <p class="success-icon">✓</p>
-              <h3>お申し込みを受け付けました</h3>
-              <dl id="success-details" class="detail-list"></dl>
-              <p class="success-note">担当者よりご連絡いたします。</p>
-              <button type="button" class="btn-secondary btn-full" id="restart-btn">別のレッスンを予約する</button>
+            <div id="step-form" class="step-panel hidden">
+              <button type="button" class="link-back" data-back="date">← 日付に戻る</button>
+              <p class="step-heading">お客様情報</p>
+              <div class="selected-summary" id="selected-summary"></div>
+              <form id="booking-form" class="form">
+                <label>お名前 <span class="req">必須</span>
+                  <input type="text" name="name" required autocomplete="name" placeholder="山田 花子">
+                </label>
+                <label>電話番号 <span class="req">必須</span>
+                  <input type="tel" name="phone" required autocomplete="tel" placeholder="090-1234-5678">
+                </label>
+                <label>メールアドレス <span class="req">必須</span>
+                  <input type="email" name="email" required autocomplete="email" placeholder="example@email.com">
+                </label>
+                <label>ご質問・ご要望
+                  <textarea name="note" rows="3" placeholder="初めてのヨガです、など"></textarea>
+                </label>
+                <button type="submit" class="btn-primary btn-full" id="submit-btn">この内容で申し込む</button>
+              </form>
+            </div>
+
+            <div id="step-submitting" class="step-panel hidden">
+              <div class="state-msg">申し込みを送信しています…</div>
+            </div>
+
+            <div id="step-success" class="step-panel hidden">
+              <div class="success-box">
+                <p class="success-icon">✓</p>
+                <h3>お申し込みを受け付けました</h3>
+                <dl id="success-details" class="detail-list"></dl>
+                <p class="success-note">担当者よりご連絡いたします。</p>
+                <button type="button" class="btn-secondary btn-full" id="restart-btn">別のレッスンを予約する</button>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
 
-    <section class="teams-section" id="team">
-      <button type="button" class="teams-banner" id="teams-toggle" aria-expanded="false" aria-controls="teams-panel">
-        <span class="teams-banner-inner">
-          <span class="teams-banner-label">TEAMS</span>
-          <span class="teams-banner-title">インストラクター紹介</span>
-        </span>
-        <span class="teams-banner-chevron" aria-hidden="true"></span>
-      </button>
-      <div class="teams-panel" id="teams-panel" hidden>
-        <p class="teams-desc">共同スタジオのインストラクターと担当レッスン</p>
-        <div id="team-grid" class="team-grid"></div>
-      </div>
-    </section>
+      <section class="teams-section" id="team">
+        <button type="button" class="teams-banner" id="teams-toggle" aria-expanded="false" aria-controls="teams-panel">
+          <span class="teams-banner-inner">
+            <span class="teams-banner-label">TEAMS</span>
+            <span class="teams-banner-title">インストラクター紹介</span>
+          </span>
+          <span class="teams-banner-chevron" aria-hidden="true"></span>
+        </button>
+        <div class="teams-panel" id="teams-panel" hidden>
+          <p class="teams-desc">共同スタジオのインストラクターと担当レッスン</p>
+          <div id="team-grid" class="team-grid"></div>
+        </div>
+      </section>
 
-    <section class="section section-muted" id="voice">
-      <div class="section-head">
-        <p class="section-label">VOICE</p>
-        <h2>お客様の声</h2>
-      </div>
-      <div class="voice-grid">
-        <article class="voice-card">
-          <p class="voice-meta">M.Sさん（34歳・会社員）</p>
-          <h3>「大量の汗が気持ちいい！」</h3>
-          <p>運動不足解消のために入会。毎回信じられないくらい汗をかけて、レッスン後は心も体もスッキリ。むくみも改善されました。</p>
-        </article>
-        <article class="voice-card">
-          <p class="voice-meta">K.Tさん（42歳・主婦）</p>
-          <h3>「冷え性が改善された」</h3>
-          <p>長年の悩みだった冷え性が少しずつ改善。レッスンの種類が豊富で、その日の気分で選べるのも楽しいです。</p>
-        </article>
-      </div>
-    </section>
+      <section class="sub-section" id="voice">
+        <p class="sub-label">VOICE</p>
+        <h2 class="sub-title">お客様の声</h2>
+        <div class="voice-grid">
+          <article class="voice-card">
+            <p class="voice-meta">M.Sさん（34歳・会社員）</p>
+            <h3>「大量の汗が気持ちいい！」</h3>
+            <p>運動不足解消のために入会。毎回信じられないくらい汗をかけて、レッスン後は心も体もスッキリ。むくみも改善されました。</p>
+          </article>
+          <article class="voice-card">
+            <p class="voice-meta">K.Tさん（42歳・主婦）</p>
+            <h3>「冷え性が改善された」</h3>
+            <p>長年の悩みだった冷え性が少しずつ改善。レッスンの種類が豊富で、その日の気分で選べるのも楽しいです。</p>
+          </article>
+        </div>
+      </section>
 
-    <section class="section" id="faq">
-      <div class="section-head">
-        <p class="section-label">FAQ</p>
-        <h2>よくあるご質問</h2>
-      </div>
-      <div class="faq-list">
-        <details class="faq-item">
-          <summary>ヨガ未経験で、体も硬いのですが大丈夫ですか？</summary>
-          <p>全く問題ありません。会員様の多くが未経験からスタートされています。経験豊富なインストラクターが丁寧にサポートします。</p>
-        </details>
-        <details class="faq-item">
-          <summary>体験レッスン時の持ち物を教えてください。</summary>
-          <p>動きやすい服装、水分、替えの下着をご用意ください。タオル・ヨガマットは当日無料でレンタル可能です。</p>
-        </details>
-        <details class="faq-item">
-          <summary>体験後に無理な勧誘はありますか？</summary>
-          <p>一切ございません。体験レッスンでJOYFITの良さを実感していただき、ご検討いただければ幸いです。</p>
-        </details>
-      </div>
-    </section>
-  </main>
+      <section class="sub-section" id="faq">
+        <p class="sub-label">FAQ</p>
+        <h2 class="sub-title">よくあるご質問</h2>
+        <div class="faq-list">
+          <details class="faq-item">
+            <summary>ヨガ未経験で、体も硬いのですが大丈夫ですか？</summary>
+            <p>全く問題ありません。会員様の多くが未経験からスタートされています。経験豊富なインストラクターが丁寧にサポートします。</p>
+          </details>
+          <details class="faq-item">
+            <summary>体験レッスン時の持ち物を教えてください。</summary>
+            <p>動きやすい服装、水分、替えの下着をご用意ください。タオル・ヨガマットは当日無料でレンタル可能です。</p>
+          </details>
+          <details class="faq-item">
+            <summary>体験後に無理な勧誘はありますか？</summary>
+            <p>一切ございません。体験レッスンでJOYFITの良さを実感していただき、ご検討いただければ幸いです。</p>
+          </details>
+        </div>
+      </section>
+    </main>
 
-  <footer class="site-footer">
-    <p>© 2026 JOYFIT24 経堂</p>
-  </footer>
+    <footer class="site-footer">
+      <p>© 2026 JOYFIT24 経堂</p>
+    </footer>
+  </div>
 
   <script src="app.js"></script>
 </body>
