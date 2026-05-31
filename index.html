@@ -100,55 +100,71 @@
         </div>
       </section>
 
-      <section class="teams-section" id="team">
-        <button type="button" class="teams-banner" id="teams-toggle" aria-expanded="false" aria-controls="teams-panel">
-          <span class="teams-banner-inner">
-            <span class="teams-banner-label">TEAMS</span>
-            <span class="teams-banner-title">インストラクター紹介</span>
-          </span>
-          <span class="teams-banner-chevron" aria-hidden="true"></span>
-        </button>
-        <div class="teams-panel" id="teams-panel" hidden>
-          <p class="teams-desc">共同スタジオのインストラクターと担当レッスン</p>
-          <div id="team-grid" class="team-grid"></div>
-        </div>
-      </section>
+      <div class="fold-stack">
+        <section class="fold-section" id="team">
+          <button type="button" class="fold-banner" id="teams-toggle" aria-expanded="false" aria-controls="teams-panel">
+            <span class="fold-banner-text">
+              <span class="fold-banner-label">TEAMS</span>
+              <span class="fold-banner-title">インストラクター紹介</span>
+            </span>
+            <span class="fold-chevron" aria-hidden="true"></span>
+          </button>
+          <div class="fold-panel" id="teams-panel" hidden>
+            <p class="fold-panel-desc">共同スタジオのインストラクターと担当レッスン</p>
+            <div id="team-grid" class="team-grid"></div>
+          </div>
+        </section>
 
-      <section class="sub-section" id="voice">
-        <p class="sub-label">VOICE</p>
-        <h2 class="sub-title">お客様の声</h2>
-        <div class="voice-grid">
-          <article class="voice-card">
-            <p class="voice-meta">M.Sさん（34歳・会社員）</p>
-            <h3>「大量の汗が気持ちいい！」</h3>
-            <p>運動不足解消のために入会。毎回信じられないくらい汗をかけて、レッスン後は心も体もスッキリ。むくみも改善されました。</p>
-          </article>
-          <article class="voice-card">
-            <p class="voice-meta">K.Tさん（42歳・主婦）</p>
-            <h3>「冷え性が改善された」</h3>
-            <p>長年の悩みだった冷え性が少しずつ改善。レッスンの種類が豊富で、その日の気分で選べるのも楽しいです。</p>
-          </article>
-        </div>
-      </section>
+        <section class="fold-section" id="voice">
+          <button type="button" class="fold-banner" id="voice-toggle" aria-expanded="false" aria-controls="voice-panel">
+            <span class="fold-banner-text">
+              <span class="fold-banner-label">VOICE</span>
+              <span class="fold-banner-title">お客様の声</span>
+            </span>
+            <span class="fold-chevron" aria-hidden="true"></span>
+          </button>
+          <div class="fold-panel" id="voice-panel" hidden>
+            <div class="voice-grid">
+              <article class="voice-card">
+                <p class="voice-meta">M.Sさん（34歳・会社員）</p>
+                <h3>「大量の汗が気持ちいい！」</h3>
+                <p>運動不足解消のために入会。毎回信じられないくらい汗をかけて、レッスン後は心も体もスッキリ。むくみも改善されました。</p>
+              </article>
+              <article class="voice-card">
+                <p class="voice-meta">K.Tさん（42歳・主婦）</p>
+                <h3>「冷え性が改善された」</h3>
+                <p>長年の悩みだった冷え性が少しずつ改善。レッスンの種類が豊富で、その日の気分で選べるのも楽しいです。</p>
+              </article>
+            </div>
+          </div>
+        </section>
 
-      <section class="sub-section" id="faq">
-        <p class="sub-label">FAQ</p>
-        <h2 class="sub-title">よくあるご質問</h2>
-        <div class="faq-list">
-          <details class="faq-item">
-            <summary>ヨガ未経験で、体も硬いのですが大丈夫ですか？</summary>
-            <p>全く問題ありません。会員様の多くが未経験からスタートされています。経験豊富なインストラクターが丁寧にサポートします。</p>
-          </details>
-          <details class="faq-item">
-            <summary>体験レッスン時の持ち物を教えてください。</summary>
-            <p>動きやすい服装、水分、替えの下着をご用意ください。タオル・ヨガマットは当日無料でレンタル可能です。</p>
-          </details>
-          <details class="faq-item">
-            <summary>体験後に無理な勧誘はありますか？</summary>
-            <p>一切ございません。体験レッスンでJOYFITの良さを実感していただき、ご検討いただければ幸いです。</p>
-          </details>
-        </div>
-      </section>
+        <section class="fold-section" id="faq">
+          <button type="button" class="fold-banner" id="faq-toggle" aria-expanded="false" aria-controls="faq-panel">
+            <span class="fold-banner-text">
+              <span class="fold-banner-label">FAQ</span>
+              <span class="fold-banner-title">よくあるご質問</span>
+            </span>
+            <span class="fold-chevron" aria-hidden="true"></span>
+          </button>
+          <div class="fold-panel" id="faq-panel" hidden>
+            <div class="faq-list">
+              <details class="faq-item">
+                <summary>ヨガ未経験で、体も硬いのですが大丈夫ですか？</summary>
+                <p>全く問題ありません。会員様の多くが未経験からスタートされています。経験豊富なインストラクターが丁寧にサポートします。</p>
+              </details>
+              <details class="faq-item">
+                <summary>体験レッスン時の持ち物を教えてください。</summary>
+                <p>動きやすい服装、水分、替えの下着をご用意ください。タオル・ヨガマットは当日無料でレンタル可能です。</p>
+              </details>
+              <details class="faq-item">
+                <summary>体験後に無理な勧誘はありますか？</summary>
+                <p>一切ございません。体験レッスンでJOYFITの良さを実感していただき、ご検討いただければ幸いです。</p>
+              </details>
+            </div>
+          </div>
+        </section>
+      </div>
     </main>
 
     <footer class="site-footer">

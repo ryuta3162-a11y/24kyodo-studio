@@ -12,8 +12,6 @@ const els = {
   error: document.getElementById('error'),
   formFlow: document.getElementById('form-flow'),
   teamGrid: document.getElementById('team-grid'),
-  teamsToggle: document.getElementById('teams-toggle'),
-  teamsPanel: document.getElementById('teams-panel'),
   sectionDow: document.getElementById('section-dow'),
   sectionLesson: document.getElementById('section-lesson'),
   sectionDate: document.getElementById('section-date'),
@@ -209,11 +207,16 @@ async function renderTeam() {
   }
 }
 
-function toggleTeams() {
-  const open = els.teamsToggle.getAttribute('aria-expanded') === 'true';
-  els.teamsToggle.setAttribute('aria-expanded', String(!open));
-  els.teamsPanel.hidden = open;
-  els.teamsPanel.classList.toggle('is-open', !open);
+function initFoldSections() {
+  document.querySelectorAll('.fold-banner').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const panel = document.getElementById(btn.getAttribute('aria-controls'));
+      const open = btn.getAttribute('aria-expanded') === 'true';
+      btn.setAttribute('aria-expanded', String(!open));
+      panel.hidden = open;
+      panel.classList.toggle('is-open', !open);
+    });
+  });
 }
 
 function getAvailableDows() {
@@ -477,7 +480,7 @@ function restart() {
 
 els.form.addEventListener('submit', handleSubmit);
 els.restartBtn.addEventListener('click', restart);
-els.teamsToggle.addEventListener('click', toggleTeams);
+initFoldSections();
 
 async function init() {
   try {
