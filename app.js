@@ -23,8 +23,7 @@ const els = {
   dowTabs: document.getElementById('dow-tabs'),
   dowQuick: document.getElementById('dow-quick'),
   lessonList: document.getElementById('lesson-list'),
-  selectedDowLabel: document.getElementById('selected-dow-label'),
-  selectedDowCount: document.getElementById('selected-dow-count'),
+  lessonListLabel: document.getElementById('lesson-list-label'),
   selectedLessonSummary: document.getElementById('selected-lesson-summary'),
   dateList: document.getElementById('date-list'),
   selectedSummary: document.getElementById('selected-summary'),
@@ -187,29 +186,6 @@ function getAvailableDows() {
   return (state.data.dowOrder || []).filter((d) => dows.has(d));
 }
 
-function renderDowTabs() {
-  els.dowTabs.innerHTML = '';
-  getAvailableDows().forEach((dow) => {
-    const count = countLessonsForDow(dow);
-    const btn = document.createElement('button');
-    btn.type = 'button';
-    btn.className = 'dow-tab';
-    btn.innerHTML = `
-      <span class="dow-tab-char">${dow}</span>
-      <span class="dow-tab-label">${DOW_LABEL[dow] || ''}</span>
-      <span class="dow-tab-count">${count}クラス</span>
-    `;
-    btn.addEventListener('click', () => {
-      state.selectedDow = dow;
-      state.selectedTemplate = null;
-      state.selectedBooking = null;
-      renderLessons(dow);
-      showPanel('lesson');
-    });
-    els.dowTabs.appendChild(btn);
-  });
-}
-
 function parseTimeMin(t) {
   const [h, m] = String(t).split(':').map(Number);
   return h * 60 + (m || 0);
@@ -220,21 +196,50 @@ function calcDuration(start, end) {
   return mins > 0 ? `${mins}分` : '';
 }
 
-function renderDowQuick(activeDow) {
-  if (!els.dowQuick) return;
-  els.dowQuick.innerHTML = '';
+function renderDowStrip(container, { active = null, pickMode = false, onSelect }) {
+  if (!container) return;
+  container.innerHTML = '';
+  container.className = pickMode ? 'dow-strip dow-strip--pick' : 'dow-strip';
+
   getAvailableDows().forEach((dow) => {
+    const count = countLessonsForDow(dow);
     const btn = document.createElement('button');
     btn.type = 'button';
-    btn.className = `dow-quick-btn${dow === activeDow ? ' active' : ''}`;
-    btn.textContent = dow;
-    btn.addEventListener('click', () => {
-      if (dow !== activeDow) {
-        state.selectedDow = dow;
-        renderLessons(dow);
+    btn.className = 'dow-strip-btn';
+    if (dow === active) btn.classList.add('active');
+    if (dow === '土' || dow === '日') btn.classList.add('weekend');
+    btn.innerHTML = pickMode
+      ? `<span class="ds-char">${dow}</span><span class="ds-sub">${DOW_LABEL[dow] || ''}</span><span class="ds-count">${count}</span>`
+      : `<span class="ds-char">${dow}</span>`;
+    btn.addEventListener('click', () => onSelect(dow));
+    container.appendChild(btn);
+  });
+}
+
+function renderDowTabs() {
+  renderDowStrip(els.dowTabs, {
+    pickMode: true,
+    onSelect: (dow) => {
+      state.selectedDow = dow;
+      state.selectedTemplate = null;
+      state.selectedBooking = null;
+      renderLessons(dow);
+      showPanel('lesson');
+    },
+  });
+}
+
+function renderDowQuick(activeDow) {
+  renderDowStrip(els.dowQuick, {
+    active: activeDow,
+    onSelect: (dow) => {
+      if (dow === activeDow) {
+        showPanel('dow');
+        return;
       }
-    });
-    els.dowQuick.appendChild(btn);
+      state.selectedDow = dow;
+      renderLessons(dow);
+    },
   });
 }
 
@@ -242,31 +247,27 @@ function buildLessonCard(tpl, dow, dates, index) {
   const duration = calcDuration(tpl.start, tpl.end);
   const card = document.createElement('article');
   card.className = 'lesson-card';
-  card.style.animationDelay = `${index * 0.05}s`;
+  card.style.animationDelay = `${index * 0.06}s`;
   card.setAttribute('role', 'button');
   card.setAttribute('tabindex', '0');
 
-  const tags = [
-    tpl.stars ? `<span class="tag tag-level">${escapeHtml(tpl.stars)}</span>` : '',
-    duration ? `<span class="tag tag-duration">${duration}</span>` : '',
-    tpl.note ? `<span class="tag tag-note">${escapeHtml(tpl.note)}</span>` : '',
+  const meta = [
+    tpl.stars ? `<span class="lc-stars">${escapeHtml(tpl.stars)}</span>` : '',
+    tpl.note ? `<span class="lc-note">${escapeHtml(tpl.note)}</span>` : '',
   ].filter(Boolean).join('');
 
   card.innerHTML = `
-    <div class="lesson-time-col">
-      <span class="lesson-start">${tpl.start}</span>
-      <span class="lesson-time-line"></span>
-      <span class="lesson-end">${tpl.end}</span>
+    <div class="lc-time">
+      <span class="lc-start">${tpl.start}</span>
+      ${duration ? `<span class="lc-dur">${duration}</span>` : ''}
     </div>
-    <div class="lesson-body">
-      <p class="lesson-name">${escapeHtml(tpl.lessonName)}</p>
-      <div class="lesson-footer">
-        <span class="lesson-instructor">${escapeHtml(tpl.instructor)}</span>
-        ${tags ? `<div class="lesson-tags">${tags}</div>` : ''}
-      </div>
+    <div class="lc-body">
+      <p class="lc-name">${escapeHtml(tpl.lessonName)}</p>
+      <p class="lc-inst">${escapeHtml(tpl.instructor)}</p>
+      ${meta ? `<div class="lc-meta">${meta}</div>` : ''}
     </div>
-    <span class="lesson-chevron" aria-hidden="true">
-      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span class="lc-arrow" aria-hidden="true">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M7 5l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </span>
   `;
 
@@ -289,9 +290,10 @@ function buildLessonCard(tpl, dow, dates, index) {
 }
 
 function renderLessons(dow) {
-  els.selectedDowLabel.textContent = `${DOW_FULL[dow] || dow}のレッスン`;
   const count = countLessonsForDow(dow);
-  if (els.selectedDowCount) els.selectedDowCount.textContent = `${count}クラス`;
+  if (els.lessonListLabel) {
+    els.lessonListLabel.textContent = `${DOW_FULL[dow] || dow} · ${count}クラス`;
+  }
   renderDowQuick(dow);
   els.lessonList.innerHTML = '';
 

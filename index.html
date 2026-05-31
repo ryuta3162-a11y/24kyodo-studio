@@ -35,21 +35,13 @@
             <div id="error" class="state-msg state-error hidden"></div>
 
             <div id="step-dow" class="step-panel hidden">
-              <p class="step-hint">体験したい曜日をタップしてください</p>
-              <div id="dow-tabs" class="dow-tabs"></div>
+              <p class="step-hint">体験したい曜日を選んでください</p>
+              <div id="dow-tabs" class="dow-strip dow-strip--pick"></div>
             </div>
 
             <div id="step-lesson" class="step-panel hidden">
-              <div class="step-toolbar">
-                <button type="button" class="btn-icon-back" data-back="dow" aria-label="曜日に戻る">
-                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 3L5 8l5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                </button>
-                <div class="step-toolbar-text">
-                  <span class="step-toolbar-title" id="selected-dow-label"></span>
-                  <span class="step-toolbar-sub" id="selected-dow-count"></span>
-                </div>
-              </div>
-              <div id="dow-quick" class="dow-quick"></div>
+              <div id="dow-quick" class="dow-strip"></div>
+              <p class="lesson-list-label" id="lesson-list-label"></p>
               <div id="lesson-list" class="lesson-list"></div>
             </div>
 
