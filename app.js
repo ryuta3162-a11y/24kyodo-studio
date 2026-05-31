@@ -248,6 +248,7 @@ function buildLessonCard(tpl, dow, dates, index) {
   const duration = calcDuration(tpl.start, tpl.end);
   const card = document.createElement('article');
   card.className = 'lesson-card';
+  card.dataset.dow = dow;
   card.style.animationDelay = `${index * 0.06}s`;
   card.setAttribute('role', 'button');
   card.setAttribute('tabindex', '0');
@@ -294,6 +295,10 @@ function renderLessons(dow) {
   const count = countLessonsForDow(dow);
   if (els.lessonListLabel) {
     els.lessonListLabel.textContent = `${DOW_FULL[dow] || dow} · ${count}クラス`;
+    els.lessonListLabel.className = 'lesson-list-label';
+    if (dow === '土') els.lessonListLabel.classList.add('label-sat');
+    else if (dow === '日') els.lessonListLabel.classList.add('label-sun');
+    else els.lessonListLabel.classList.add('label-wday');
   }
   renderDowQuick(dow);
   els.lessonList.innerHTML = '';
